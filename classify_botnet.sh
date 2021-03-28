@@ -1,11 +1,16 @@
 
 # script for automatizing the classification call
 
-if [ $# -eq 0 ]
+if [ $# -ne 5 ]
 then
-    D=3
+    echo 'Err: $d_name $D $tau_end $seed $series_len'
+    exit 1
 else
-    D=$1
+    d_name=$1
+    D=$2
+    tau_end=$3
+    seed=$4
+    series_len=$5
 fi
 
 
@@ -13,7 +18,7 @@ fi
 two_class='FALSE'
 
 # botnet path
-dataset_path='./data/botnet/1000'
+#dataset_path='./data/botnet/1000'
 
 # fixing the seed and check the best field
 #seed=1
@@ -24,12 +29,14 @@ field="HH_L5_radius"
 #field="HH_jit_L5_variance"
 start_seq=1
 total=30
-for seed in $(seq $start_seq $((start_seq + total - 1)))
-do
+#for seed in $(seq $start_seq $((start_seq + total - 1)))
+#do
     #echo $field
-    d_name=$field"_feats"
-    Rscript classify.R $d_name $D $seed $dataset_path FALSE $two_class
-done
+    #d_name=$field"_feats"
+    d_name=$d_name".csv"
+    #Rscript classify.R $d_name $D $seed $dataset_path FALSE $two_class
+    Rscript classify_botnet.R $d_name $D $tau_end $seed $series_len
+#done
 
 # TODO: check this
 # the best features for D3 were these (ascending order):

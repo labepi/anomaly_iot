@@ -49,6 +49,12 @@ if (length(args) == 0)
     #tau_l=1:50
     tau_l=1:10
 
+    # default SEED is loaded from config.R
+    #SEED=1
+
+    # used for loading the time series
+    series_len = 1000
+    #series_len = 5000
 
 } else {
     # loading the datasets
@@ -59,10 +65,14 @@ if (length(args) == 0)
     # embedding dimension
     D = as.numeric(args[2])
     
-    # embedding delay
-    tau_l = 1:10
-    
-    SEED = as.numeric(args[3])
+    # embedding delay (end of list)
+    tau_l = 1:as.numeric(args[3])
+
+    # the seed to random
+    SEED = as.numeric(args[4])
+
+    # the series len to use (1000 or 5000)
+    series_len = as.numeric(args[5])
 }
 
 # defining the seed
@@ -83,8 +93,6 @@ printdebug(paste('SEED:',SEED))
 # LOADING DATA AND COMPUTING FEATURES #
 #######################################
 
-#series_len = 1000
-series_len = 5000
 
 dataset_path = './data/botnet'
 
