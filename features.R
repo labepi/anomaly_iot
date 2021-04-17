@@ -37,17 +37,8 @@ extractFeatures = function(X, D=3, tau_l=1:10, showTime=FALSE,
                            na_aware=FALSE, na_rm=FALSE)
 {
     # TODO: check if this value must be given or set ouside here
-    num_of_features = 8 #12
-
-    # the features to compute
-    #mycolumns = c('sdEw', 'Hw', 'Cw', 'Fw', 'PST', 'Hpi', 'Cpi', 'Fpi')
-    
-    # NOTE: removing D and tau from the list
-    #mycolumns = c('D', 'tau', 'sdEw', 'Hw', 'Cw', 'Fw', 'PST', 'Hpi', 'Cpi', 'Fpi')
-    
-    # NOTE: these features have low importance
-    # 'lenE', 'meanEw', 
-    #buildTime = Sys.time()
+    # number of computed features per tau
+    num_of_features = 8
 
     # the length of the series
     m = ncol(X)
@@ -56,8 +47,17 @@ extractFeatures = function(X, D=3, tau_l=1:10, showTime=FALSE,
     # informed tau_l can be used
     max_tau = min(length(tau_l), checkMaxTau(m, D, lim=2))
 
+    # the dataset result of computed features
+    num_comp_feats = num_of_features*(length(tau_l))
+
     # TODO: check if this is the best strategy
-    M = matrix(0, nrow=nrow(X), ncol=num_of_features*max_tau)
+    # NOTE: +1 to add the class type
+    #M = matrix(0, nrow=nrow(X), ncol=num_comp_feats+1)
+    M = matrix(0, nrow=nrow(X), ncol=num_comp_feats)
+    #ds = matrix(0, ncol=(num_comp_feats+1), nrow=0)
+    
+    #colnames(M) = c(paste('f',1:num_comp_feats, sep=''), 'class')
+    colnames(M) = paste('f',1:num_comp_feats, sep='')
 
     #print(dim(M))
 
@@ -67,19 +67,24 @@ extractFeatures = function(X, D=3, tau_l=1:10, showTime=FALSE,
         {
             buildTimeSeries = Sys.time()
         }
+    
+        # filtering
+        #xtmp = X[i,1:series_len]
+        xtmp = X[i,]
 
-        #tmp = extractFeatureSingle(X[i,], D, tau_l, 
-        M[i,] = extractFeatureSingle(X[i,], D, tau_l, 
+        # MULTISCALE FEATURES TRANSFORMATION
+
+        # extracting features for each time series 
+        feats = extractFeatureSingle(X[i,], D, tau_l, 
                                      na_aware=na_aware, na_rm=na_rm)
 
-        #print(tmp)
-        #print(length(tmp))
+        # NOTE: maybe this is not necessary
+        # adjusting features positions, just to be visually identifiable
+        feats = featuresPosAdjust(feats, num_of_features=num_of_features)
 
-        #print(M[i,])
-        #print(length(M[i,]))
-        
-        #quit()
-        
+        # adding computed features to the dataset
+        M[i,] = feats
+
         if (showTime == TRUE)
         {
             buildTimeSeries = difftime(Sys.time(), buildTimeSeries, units='sec')
@@ -89,21 +94,6 @@ extractFeatures = function(X, D=3, tau_l=1:10, showTime=FALSE,
 
     #buildTime = difftime(Sys.time(), buildTime, units='sec')
     #print(buildTime)
-
-    # TODO: maybe this is not necessary
-
-    # NOTE: reordering features to join same type together
-    tau_pos = (0:(ncol(M)-1) %% num_of_features) + 1
-    new_pos = c()
-    for(i in 1:num_of_features)
-    {
-        new_pos = c(new_pos, which(tau_pos == i))
-    }
-    M = M[,c(new_pos)]
-
-    # NOTE: setting features names
-    #colnames(M) = mycolumns
-    colnames(M) = paste('f', 1:ncol(M), sep='')
 
     return(M)
 }
@@ -252,128 +242,6 @@ featuresPosAdjust = function(feats, num_of_features = 8)
     }
     
     return(feats[new_pos])
-}
-
-
-
-
-# Functions for computing the (H,C) paris for all tau_l
-# this function is used in the single step classification
-#
-# X - the dataset containing all time series data
-# D -  the embedding dimension
-# tau_l - a list of embedding delays, the returning features are
-#       collapsed sequentially by the tau used to compute them
-# na_aware - if TRUE, the symbols with only NAs will be counted separated
-# na_rm - if TRUE and na_aware=TRUE, the "NA patterns" are not counted
-#
-# Returns the following computed list of features (for each time series):
-# 1. (H) shannon entropy of BP distribution
-# 2. (C) complexity of BP dist.
-extractFeaturesHC = function(X, D=3, tau=1, na_aware=FALSE, na_rm=FALSE)
-{
-    # TODO: check if this value must be given or set ouside here
-    num_of_features = 2
-
-    #buildTime = Sys.time()
-
-    # the length of the series
-    m = ncol(X)
-
-    # checking the max number of tau, for this dataset, and if the
-    # informed tau_l can be used
-    #max_tau = min(length(tau_l), checkMaxTau(m, D, lim=2))
-
-    # TODO: check if this is the best strategy
-    M = matrix(0, nrow=nrow(X), ncol=num_of_features)
-
-    for(i in 1:nrow(X))
-    {
-        #if (showTime == TRUE)
-        #{
-        #    buildTimeSeries = Sys.time()
-        #}
-        
-        #tmp = extractFeatureSingleHC(X[i,], D, tau, na_aware=na_aware, na_rm=na_rm)
-        #print(tmp)
-        #quit()
-        
-        M[i,] = extractFeatureSingleHC(X[i,], D, tau, na_aware=na_aware, na_rm=na_rm)
-
-        #if (showTime == TRUE)
-        #{
-        #    buildTimeSeries = difftime(Sys.time(), buildTimeSeries, units='sec')
-        #    cat('TIME PER SERIES:',buildTimeSeries,'\n')
-        #}
-        #print(M[i,])
-        #print(length(M[i,]))
-    }
-
-    #buildTime = difftime(Sys.time(), buildTime, units='sec')
-    #print(buildTime)
-
-    return(M)
-}
-
-
-
-# computing the (H,C) pairs for all tau_l of a single time series
-# x - a single time series data
-# D -  the embedding dimension
-# tau - the embedding delay
-# na_aware - if TRUE, the symbols with only NAs will be counted separated
-# na_rm - if TRUE and na_aware=TRUE, the "NA patterns" are not counted
-#
-# Returns the following computed list of features:
-# 1. (H) shannon entropy of BP distribution
-# 2. (C) complexity of BP dist.
-extractFeatureSingleHC = function(x, D=3, tau=1, na_aware=FALSE, na_rm=FALSE)
-{
-    # all features will be together
-    #data = c()
-
-    # length of series
-    m = length(x)
-    
-    # computing features for each tau
-        if (checkParameters(m, D, tau, lim=2) == FALSE)
-        {
-            next
-        }
-
-        #if (showTime == TRUE)
-        #{
-        #    buildTimeTau = Sys.time()
-        #}
-        
-        # computing the bandt_pompe distribution
-        bpd = bandt_pompe_distribution(as.numeric(x), D=D, tau=tau,
-                                     na_aware=na_aware, na_rm=na_rm)
-        #bpd = bandt_pompe_distribution2(as.numeric(x), D=D, tau=tau) #old version
-
-        # shannon entropy
-        Hpi = shannon_entropy(bpd$probabilities, normalized=TRUE)
-
-        # statistical complexity
-        Cpi = complexity(bpd$probabilities, Hpi)
-
-        #if (showTime == TRUE)
-        #{
-        #    buildTimeTau = difftime(Sys.time(), buildTimeTau, units='sec')
-        #    cat('TIME PER TAU:',buildTimeTau,'\n')
-        #}
-
-        # the current vector of features
-        curdata = c(Hpi, Cpi)
-
-        # TODO: check this:
-        # making NA and NaN features values to be 0?
-        #curdata[is.na(curdata)] = 0
-
-        # joining each features vector
-        #data = c(data, curdata)
-
-    return(curdata)
 }
 
 
