@@ -68,10 +68,16 @@ if (length(args) == 0)
     #series_len = 5000
 
     # trying a single model for device
-    device = 'Danmini_Doorbell'
+    #device = 'Danmini_Doorbell'
+    #device = 'Ecobee_Thermostat'
+    #device = 'Ennio_Doorbell'
+    device = 'Philips_B120N10_Baby_Monitor'
+    #device = 'Provision_PT_737E_Security_Camera'
+    #device = 'Provision_PT_838_Security_Camera'
+    #device = 'Samsung_SNH_1011_N_Webcam'
+    #device = 'SimpleHome_XCS7_1002_WHT_Security_Camera'
+    #device = 'SimpleHome_XCS7_1003_WHT_Security_Camera'
 
-    # the attack data
-    attack = 2
 
 } else {
     # loading the datasets
@@ -93,9 +99,6 @@ if (length(args) == 0)
     
     # the device
     device = args[6]
-
-    # the attack data
-    attack = as.numeric(args[7])
 }
 
 # defining the seed
@@ -131,17 +134,17 @@ num_rows=10000
 
 f_names = data.frame(
             files = c(
-            'benign_traffic',
-            'mirai/ack',
-            'mirai/scan',
-            'mirai/syn',
-            'mirai/udp',
-            'mirai/udpplain',
-            'gafgyt/combo',
-            'gafgyt/junk',
-            'gafgyt/scan',
-            'gafgyt/tcp',
-            'gafgyt/udp'),
+            'benign_traffic.csv',
+            'mirai/ack.csv',
+            'mirai/scan.csv',
+            'mirai/syn.csv',
+            'mirai/udp.csv',
+            'mirai/udpplain.csv',
+            'gafgyt/combo.csv',
+            'gafgyt/junk.csv',
+            'gafgyt/scan.csv',
+            'gafgyt/tcp.csv',
+            'gafgyt/udp.csv'),
             groups = c(1,rep(2,5), rep(3,5)),
             labels = 1:11,
             stringsAsFactors=FALSE
@@ -154,165 +157,286 @@ f_names = data.frame(
 #######################################
 
 
-# LOADING BENIGN DATA
-#####################
-
-
 dataset_path = './data/botnet/original'
-
-# loading benign data
-# these are prepared botnet data, from N-BaIoT
-x_ben = read.csv(paste(dataset_path, '/', device, '/', f_names[1,1], '.csv', sep=''))
-
-# TODO: for multi features classifiers, this is the place
-
-# filtering by a single feature
-x_ben_feat = x_ben[,d_name]
-
-# 
-x_ben_df = matrix(x_ben_feat, byrow=T, ncol=series_len)
-y_ben_df = rep(1, nrow(x_ben_df))
-
-print(dim(x_ben_df))
-
-
-# TODO: testar o ccep
-
-HC = matrix(0, ncol=3, nrow=nrow(x_ben_df))
-
-for(i in 1:nrow(x_ben_df))
-{
-    HC[i,] = complexity_entropy(x_ben_df[i,], D=3, tau=1)
-}
-
-
-# utilizando apenas os dados pra classificar, nao da bom
-#rf = svm(x_ben_df, y_ben_df, type='one-classification') #train an one-classification model 
-#sum(predict(rf, x_ben_df) == TRUE)
-#23
-
-
-# TODO: testing the two-class case: benign or malign
-#x[,series_len+1][x[,series_len+1] != 1] = 2
 
 # number of computed features per tau
 num_of_features = 8
 
-# computing features for the whole dataset, for all time series
-# all the time series
-x_all = extractFeatures(x_ben_df, D, tau_l, showTime=FALSE, na_aware=FALSE, na_rm=FALSE)
 
-# all classes 
-y_all = y_ben_df
-
-################ SPLIT TRAIN/TEST ###############
-
-## define the split rate
-#id_train = createDataPartition(y=y_all, p=train_pct, list=FALSE)
-id_train = 1:round(nrow(x_all)/2)
-
-# Splitting datasets
-x_train = x_all[id_train,]
-y_train = y_all[id_train]
-
-x_test = x_all[-id_train,]
-y_test = y_all[-id_train]
-
-# TODO: testing the one-class classification
-
-#id_train = which(y_all == 1)
-#
-#x_train = x_all[id_train,]  #choose only one of the classes
-#y_train = y_all[id_train]
-#
-##x <- subset(df, select = -Species) #make x variables
-##y <- df$Species #make y variable(dependent)
-#
-#x_test = x_all
-#y_test = y_all
-#y_test[y_test != 1] = 0
-
-
-# LOADING ATACK DATA
+# LOADING BENIGN DATA
 #####################
 
+# loading benign data
 # these are prepared botnet data, from N-BaIoT
-#x_ata = read.csv(paste(dataset_path, '/', device, '/', f_names[2,1], '.csv', sep=''))
-x_ata = read.csv(paste(dataset_path, '/', device, '/', f_names[attack,1], '.csv', sep=''))
-#x_ata = read.csv(paste(dataset_path, '/', device, '/', f_names[11,1], '.csv', sep=''))
-
-# filtering by a single feature
-x_ata_feat = x_ata[,d_name]
-
-# formatting dataset of series_len time series length
-x_ata_df = matrix(x_ata_feat, byrow=T, ncol=series_len)
-y_ata_df = rep(1, nrow(x_ata_df))
-
-print(dim(x_ata_df))
+x_ben = read.csv(paste(dataset_path, '/', device, '/', f_names[1,1], sep=''))
 
 
-# TODO: testar o ccep
+# LOADING ATTACK DATA
+######################
 
-HC = matrix(0, ncol=3, nrow=nrow(x_ata_df))
+# these are prepared botnet data, from N-BaIoT
+x_att = read.csv(paste(dataset_path, '/', device, '/', f_names[2,1], sep=''))
+#x_att = read.csv(paste(dataset_path, '/', device, '/', f_names[11,1], sep=''))
 
-for(i in 1:nrow(x_ata_df))
+
+
+d_name_l = c(
+#    'MI_dir_L5_weight',
+#    'H_L5_weight'
+ 'HpHp_L5_magnitude',
+# 'HH_L5_radius',
+ 'HH_L5_covariance',
+ 'HpHp_L5_pcc',
+ 'HH_L5_magnitude',
+ 'MI_dir_L5_weight',
+ 'H_L5_weight'
+)
+
+# multiple models
+model = list()
+
+# the classification results
+res = list()
+
+i = 0
+
+# multi features classifiers
+for (d_name in d_name_l)
 {
-    HC[i,] = complexity_entropy(x_ata_df[i,], D=3, tau=1)
+    # the model index
+    i = i + 1
+
+    # BENIGN DATA
+    #############
+
+    # filtering by a single feature
+    x_ben_feat = x_ben[,d_name]
+
+    # transforming a single feature vector in a dataset
+    # organizing the feature as a matrix
+    x_ben_df = featureAsDataset(x_ben_feat, series_len, label=1)
+
+    # removing class column from dataset matrix
+    y_ben_df = x_ben_df[,ncol(x_ben_df)]
+    x_ben_df = x_ben_df[,-ncol(x_ben_df)]
+
+    print(dim(x_ben_df))
+
+    # TODO: esta dando valores diferentes quando usa-se o metodo featureAsDataset
+
+    # computing features for the whole dataset, for all time series
+    x_all = extractFeatures(x_ben_df, D, tau_l, showTime=FALSE, na_aware=FALSE, na_rm=FALSE)
+
+    # all classes 
+    y_all = y_ben_df
+
+    
+    # ATTACK DATA
+    #############
+
+    # filtering by a single feature
+    x_att_feat = x_att[,d_name]
+
+    # #TODO: here the label may change for separating different types of
+    # attacks
+
+    # formatting dataset of series_len time series length
+    x_att_df = featureAsDataset(x_att_feat, series_len, label=0)
+
+    # removing class column from dataset matrix
+    y_att_df = x_att_df[,ncol(x_att_df)]
+    x_att_df = x_att_df[,-ncol(x_att_df)]
+
+    print(dim(x_att_df))
+
+    # computing features for the whole dataset, for all time series
+    x_all_att = extractFeatures(x_att_df, D, tau_l, showTime=FALSE, na_aware=FALSE, na_rm=FALSE)
+
+    # all classes
+    y_all_att = y_att_df
+
+
+    ################ SPLIT TRAIN/TEST ###############
+
+    # BENIGN DATA
+    #############
+
+    ## define the split rate
+    #id_train = createDataPartition(y=y_all, p=train_pct, list=FALSE)
+    # NOTE: using half the time series for training on benign data
+    id_train = 1:round(nrow(x_all)/2)
+
+    # Splitting datasets
+    x_train = x_all[id_train,]
+    y_train = y_all[id_train]
+
+    x_test = x_all[-id_train,]
+    y_test = y_all[-id_train]
+
+
+    # ATTACK DATA
+    #############
+
+    x_test = rbind(x_test, x_all_att)
+    y_test = c(y_test, y_all_att)
+
+
+    ### TODO: ### TODO: ### TODO: ### TODO: ###
+    # testando remover as features do numero de arestas
+    ###########################################
+
+    # depois remover do proprio features.R
+    x_train = x_train[,-tau_l]
+    x_test = x_test[,-tau_l]
+
+    ### TODO: ### TODO: ### TODO: ### TODO: ###
+    # TODO: parei aqui
+    # ok - concatenar as features de ataque no dataset de test
+    # ok - testar a classificao geral
+    # - analisar os erros
+    # - precisa ver quais features sao melhores, pra tentar melhorar os
+    # resultados
+
+    ################ SCALING DATA ###############
+
+    printdebug('Scaling data')
+
+    # TODO: we have to scale the computed features 
+    # preprocesing the features dataset
+    transform = preProcess(x_train, method=c("center", "scale"))
+
+    x_train = predict(transform, x_train)
+    x_test  = predict(transform, x_test)
+
+    printdebug('Data scaled')
+
+    ##################################################
+    ##################################################
+    ######## TESTING SIMPLER CLASSIFIER ##############
+    ##################################################
+    ##################################################
+
+    # computing model
+    model[[i]] = svm(x_train, y_train, 
+                   type='one-classification', 
+                   kernel='linear',
+                   cross=5) #train an one-classification model 
+
+    print(summary(model[[i]]))
+    
+    # TODO: test more kernels
+    # TODO: try tuning svm parameters 
+
+    # TODO: decidir se o test é junto logo ou separado
+    #}
+
+    # TODO: parei aqui
+    # - testar agora a predicao com os varois classificadores
+    # - juntar o resultado como um ensemble, definir regras)
+
+
+
+    ################ BEGIN TEST ###############
+
+    # testing the tunned parameters
+
+
+    # predicting on x_test
+    res[[i]] = predict(model[[i]], x_test)
+
+    res[[i]] = as.numeric(res[[i]])
+
+    printdebug(paste('Predicted test:', paste(y_test, res[[i]], sep='-', collapse=',')))
+
+    # confusion matrix
+    cm = confusionMatrix(table(y_test,res[[i]]))
+    printdebug(paste('OVERALL accuracy: ', d_name, cm$overall['Accuracy']))
+    #output1 = paste('FINAL_ACC', cm$overall['Accuracy'])
+
+    print(cm)
 }
 
-# computing features for the whole dataset, for all time series
-x_all_ata = extractFeatures(x_ata_df, D, tau_l, showTime=FALSE, na_aware=FALSE, na_rm=FALSE)
 
-# all classes 
-y_all_ata = rep(0, nrow(x_all_ata))
-
-
-### TODO: ### TODO: ### TODO: ### TODO: ###
-# TODO: parei aqui
-# ok - concatenar as features de ataque no dataset de test
-# ok - testar a classificao geral
-# - analisar os erros
-# - precisa ver quais features sao melhores, pra tentar melhorar os
-# resultados
-
-x_test = rbind(x_test, x_all_ata)
-y_test = c(y_test, y_all_ata)
-
-
-### TODO: ### TODO: ### TODO: ### TODO: ###
-# testando remover as features do numero de arestas
-###########################################
-
-# depois remover do proprio features.R
-x_train = x_train[,-tau_l]
-x_test = x_test[,-tau_l]
-
-################ SCALING DATA ###############
-
-printdebug('Scaling data')
-
-# TODO: we have to scale the computed features 
-# preprocesing the features dataset
-transform = preProcess(x_train, method=c("center", "scale"))
-
-x_train = predict(transform, x_train)
-x_test  = predict(transform, x_test)
-
-printdebug('Data scaled')
-
+print(res)
+print(length(res))
+print(length(res[[1]]))
+print(length(res[[2]]))
 
 #quit()
 
-
 ##################################################
-##################################################
-######## TESTING SIMPLER CLASSIFIER ##############
-##################################################
+# ENSEMBLE OF FEATURES CLASSIFIERS
 ##################################################
 
+# TODO: 
+# - acho que o ensemble nao pode ser simplesmente 'se um for 0' é 0,
+# pois assim eu estou juntando os erros de alguma feature que nao
+# classificou bem, o que devo fazer é utilizar o "peso" que cada
+# classificador possui para fazer a votação final (TKDE spin off)
+# - nao sei bem como ficará por ser on-class, mas posso ver uma simples
+# votação?
+
+# performing the ensemble here
+
+# number of results (according to the features considered)
+nrows = length(res)
+# number of time series tested
+ncols = length(y_test)
+
+# converting the list of results ins a single matrix
+res_M = matrix(unlist(res, use.names=F), ncol=ncols, byrow=T)
+
+# applying the single rule
+
+#############
+# testing for only one attack
+#############
+
+#res_attack = apply(res_M, 2, function(x) sum(x == 0)) > 0
+## all is benign, until...
+#res_all = rep(1, ncols)
+#res_all[res_attack] = 0
+
+#############
+# testing for only one benign
+#############
+
+# TODO: 100% aqui
+
+res_attack = apply(res_M, 2, function(x) sum(x == 1)) > 0
+# all is attack, until...
+res_all = rep(0, ncols)
+res_all[res_attack] = 1
+
+#############
+# testing for voting scheme
+#############
+
+#res_attack = apply(res_M, 2, function(x) sum(x == 1)) > ceiling(nrow(res_M)/2)
+## all is attack, until...
+#res_all = rep(0, ncols)
+#res_all[res_attack] = 1
 
 
-rf = svm(x_train, y_train, type='one-classification', kernel='linear') #train an one-classification model 
+print(res_all)
+
+cm = confusionMatrix(table(y_test,res_all))
+
+print(cm)
+
+printdebug(paste('OVERALL accuracy: ', cm$overall['Accuracy']))
+
+#acc = sum(res[i]==y_test)/length(y_test)
+
+#output1 = paste('FINAL_ACC', acc)
+
+#cat(d_name,SEED,output1,'\n')
+
+
+
+quit()
+
+
 
 
 ## Radon Forest classifier with tunning parameters
@@ -391,38 +515,6 @@ rf = svm(x_train, y_train, type='one-classification', kernel='linear') #train an
 #summary(rf)
 #plot(rf)
 #print(rf)
-
-################ BEGIN TEST ###############
-
-# testing the tunned parameters
-
-
-# predicting on x_test
-res = predict(rf, x_test)
-
-res = as.numeric(res)
-
-printdebug(paste('Predicted test:', paste(y_test, res, sep='-', collapse=',')))
-
-# confusion matrix
-cm = confusionMatrix(table(y_test,res))
-printdebug(paste('OVERALL accuracy: ', d_name, cm$overall['Accuracy']))
-#output1 = paste('FINAL_ACC', cm$overall['Accuracy'])
-
-print(cm)
-
-acc = sum(res==y_test)/length(y_test)
-
-attack_name = f_names[attack,1]
-
-output1 = paste('FINAL_ACC', acc)
-
-cat(d_name,attack_name,SEED,output1,'\n')
-
-
-
-
-quit()
 
 
 

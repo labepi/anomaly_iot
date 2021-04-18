@@ -1,4 +1,30 @@
 
+# transforming a single feature vector in a dataset
+
+# organizing the feature as a matrix
+featureAsDataset = function(x, series_len, label=1)
+{
+
+    # number of rows in the dataset
+    nrows = floor(length(x)/series_len)
+
+    # TODO:
+    # check if let the matrix repeat the first values to complete the
+    # number of rows, or if truncate the series and reduce one row
+
+    # organizing the feature as a matrix
+    #df = matrix(x[1:(nrows*series_len)], byrow=T, ncol=series_len)
+    df = matrix(x, byrow=T, ncol=series_len)
+
+    # TODO: check if this is necessary
+    # adding the label columns
+    df = cbind(df, rep(label, nrow(df)))
+
+    return(df)
+}
+
+
+
 # This script contains the functions for computing the features used in
 # our work
 
