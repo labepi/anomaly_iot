@@ -1,6 +1,6 @@
 #!/bin/bash
 
-if [ $# -ne 5 ]
+if [ $# -ne 6 ]
 then
     echo 'Err: $D $tau_end $seed $series_len $device $attack'
     exit 1
