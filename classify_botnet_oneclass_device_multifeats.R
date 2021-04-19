@@ -27,6 +27,12 @@ source('features.R')
 library(caret)
 library(ggplot2)
 library(reshape2)
+# some plot libs
+suppressMessages(library(ggforce))
+suppressMessages(library(grid))
+suppressMessages(library(gridExtra))
+suppressMessages(library(factoextra))
+
 
 
 printdebug('Loaded libraries and functions')
@@ -47,7 +53,7 @@ if (length(args) == 0)
     #d_name = 'MI_dir_L5_weight'  # 0.9375
     #d_name = 'MI_dir_L5_mean'     # 0.04
     #d_name = 'MI_dir_L5_variance' # 0.88
-    d_name = 'H_L5_weight'  # 0.9453
+    #d_name = 'H_L5_weight'  # 0.9453
 
     # the Bandt-Pompe parameters
 
@@ -68,37 +74,42 @@ if (length(args) == 0)
     #series_len = 5000
 
     # trying a single model for device
-    #device = 'Danmini_Doorbell'
+    device = 'Danmini_Doorbell'
     #device = 'Ecobee_Thermostat'
     #device = 'Ennio_Doorbell'
-    device = 'Philips_B120N10_Baby_Monitor'
+    #device = 'Philips_B120N10_Baby_Monitor'
     #device = 'Provision_PT_737E_Security_Camera'
     #device = 'Provision_PT_838_Security_Camera'
     #device = 'Samsung_SNH_1011_N_Webcam'
     #device = 'SimpleHome_XCS7_1002_WHT_Security_Camera'
     #device = 'SimpleHome_XCS7_1003_WHT_Security_Camera'
 
+    # the attack data
+    attack = 2
 
 } else {
     # loading the datasets
-    d_name = args[1]
+    #d_name = args[1]
     
     # the Bandt-Pompe parameters
 
     # embedding dimension
-    D = as.numeric(args[2])
+    D = as.numeric(args[1])
     
     # embedding delay (end of list)
-    tau_l = 1:as.numeric(args[3])
+    tau_l = 1:as.numeric(args[2])
 
     # the seed to random
-    SEED = as.numeric(args[4])
+    SEED = as.numeric(args[3])
 
     # the series len to use (1000 or 5000)
-    series_len = as.numeric(args[5])
+    series_len = as.numeric(args[4])
     
     # the device
-    device = args[6]
+    device = args[5]
+
+    # the attack data
+    attack = as.numeric(args[6])
 }
 
 # defining the seed
@@ -107,7 +118,7 @@ set.seed(SEED)
 # the percentage of train dataset split
 train_pct = TRAIN_PCT # from config.R
 
-printdebug(d_name)
+#printdebug(d_name)
 
 printdebug(paste('(D,tau): ',D,',',paste(range(tau_l), collapse=':'), sep=''))
 
@@ -134,17 +145,17 @@ num_rows=10000
 
 f_names = data.frame(
             files = c(
-            'benign_traffic.csv',
-            'mirai/ack.csv',
-            'mirai/scan.csv',
-            'mirai/syn.csv',
-            'mirai/udp.csv',
-            'mirai/udpplain.csv',
-            'gafgyt/combo.csv',
-            'gafgyt/junk.csv',
-            'gafgyt/scan.csv',
-            'gafgyt/tcp.csv',
-            'gafgyt/udp.csv'),
+            'benign_traffic',
+            'mirai/ack',
+            'mirai/scan',
+            'mirai/syn',
+            'mirai/udp',
+            'mirai/udpplain',
+            'gafgyt/combo',
+            'gafgyt/junk',
+            'gafgyt/scan',
+            'gafgyt/tcp',
+            'gafgyt/udp'),
             groups = c(1,rep(2,5), rep(3,5)),
             labels = 1:11,
             stringsAsFactors=FALSE
@@ -160,7 +171,9 @@ f_names = data.frame(
 dataset_path = './data/botnet/original'
 
 # number of computed features per tau
-num_of_features = 8
+#num_of_features = 5
+num_of_features = 7
+#num_of_features = 8
 
 
 # LOADING BENIGN DATA
@@ -168,28 +181,41 @@ num_of_features = 8
 
 # loading benign data
 # these are prepared botnet data, from N-BaIoT
-x_ben = read.csv(paste(dataset_path, '/', device, '/', f_names[1,1], sep=''))
+x_ben = read.csv(paste(dataset_path, '/', device, '/', f_names[1,1], '.csv', sep=''))
 
 
 # LOADING ATTACK DATA
 ######################
 
 # these are prepared botnet data, from N-BaIoT
-x_att = read.csv(paste(dataset_path, '/', device, '/', f_names[2,1], sep=''))
-#x_att = read.csv(paste(dataset_path, '/', device, '/', f_names[11,1], sep=''))
+#x_att = read.csv(paste(dataset_path, '/', device, '/', f_names[2,1], '.csv', sep=''))
+#x_att = read.csv(paste(dataset_path, '/', device, '/', f_names[11,1], '.csv', sep=''))
+x_att = read.csv(paste(dataset_path, '/', device, '/', f_names[attack,1], '.csv', sep=''))
 
 
 
 d_name_l = c(
 #    'MI_dir_L5_weight',
 #    'H_L5_weight'
- 'HpHp_L5_magnitude',
-# 'HH_L5_radius',
+# 'HpHp_L5_magnitude',
+# mirai
+# 'HH_L5_radius', 
+ 'MI_dir_L5_variance',
  'HH_L5_covariance',
- 'HpHp_L5_pcc',
+## 'HpHp_L5_pcc',
  'HH_L5_magnitude',
  'MI_dir_L5_weight',
  'H_L5_weight'
+# bashlite
+# "MI_dir_L3_variance",
+# "HH_jit_L1_mean",
+## "HpHp_L1_magnitude",
+# "HH_L0.1_std",
+## "HH_L5_magnitude",
+# "HpHp_L0.01_covariance",
+# "MI_dir_L5_weight",
+# "H_L5_weight"
+
 )
 
 # multiple models
@@ -225,7 +251,7 @@ for (d_name in d_name_l)
     # TODO: esta dando valores diferentes quando usa-se o metodo featureAsDataset
 
     # computing features for the whole dataset, for all time series
-    x_all = extractFeatures(x_ben_df, D, tau_l, showTime=FALSE, na_aware=FALSE, na_rm=FALSE)
+    x_all = extractFeatures(x_ben_df, D, tau_l, num_of_features, showTime=FALSE, na_aware=FALSE, na_rm=FALSE)
 
     # all classes 
     y_all = y_ben_df
@@ -250,7 +276,7 @@ for (d_name in d_name_l)
     print(dim(x_att_df))
 
     # computing features for the whole dataset, for all time series
-    x_all_att = extractFeatures(x_att_df, D, tau_l, showTime=FALSE, na_aware=FALSE, na_rm=FALSE)
+    x_all_att = extractFeatures(x_att_df, D, tau_l, num_of_features, showTime=FALSE, na_aware=FALSE, na_rm=FALSE)
 
     # all classes
     y_all_att = y_att_df
@@ -280,14 +306,20 @@ for (d_name in d_name_l)
     x_test = rbind(x_test, x_all_att)
     y_test = c(y_test, y_all_att)
 
+    print(dim(x_test))
+
+    
+    ########### TODO:
+    # testando a analise das features
+    plotFeatures(x_test, y_test, paste('antes-',d_name,'-', sep=''), num_of_features)
 
     ### TODO: ### TODO: ### TODO: ### TODO: ###
     # testando remover as features do numero de arestas
     ###########################################
 
     # depois remover do proprio features.R
-    x_train = x_train[,-tau_l]
-    x_test = x_test[,-tau_l]
+#    x_train = x_train[,-tau_l]
+#    x_test = x_test[,-tau_l]
 
     ### TODO: ### TODO: ### TODO: ### TODO: ###
     # TODO: parei aqui
@@ -308,6 +340,9 @@ for (d_name in d_name_l)
     x_train = predict(transform, x_train)
     x_test  = predict(transform, x_test)
 
+    # testando a analise das features
+    plotFeatures(x_test, y_test, paste('depois-',d_name,'-', sep=''), num_of_features)
+
     printdebug('Data scaled')
 
     ##################################################
@@ -319,9 +354,9 @@ for (d_name in d_name_l)
     # computing model
     model[[i]] = svm(x_train, y_train, 
                    type='one-classification', 
-                   kernel='linear',
-                   cross=5) #train an one-classification model 
-
+                   kernel='linear')
+                   #cross=5) #train an one-classification model 
+    
     print(summary(model[[i]]))
     
     # TODO: test more kernels
@@ -424,7 +459,10 @@ cm = confusionMatrix(table(y_test,res_all))
 
 print(cm)
 
-printdebug(paste('OVERALL accuracy: ', cm$overall['Accuracy']))
+
+attack_name = f_names[attack,1]
+
+printdebug(paste('OVERALL accuracy: ', attack_name, cm$overall['Accuracy']))
 
 #acc = sum(res[i]==y_test)/length(y_test)
 

@@ -59,12 +59,12 @@ featureAsDataset = function(x, series_len, label=1)
 # 10. (H) shannon entropy of BP distribution
 # 11. (C) complexity of BP dist.
 # 12. (FI) fisher information of BP dist.
-extractFeatures = function(X, D=3, tau_l=1:10, showTime=FALSE, 
-                           na_aware=FALSE, na_rm=FALSE)
+extractFeatures = function(X, D=3, tau_l=1:10, num_of_feature=8,
+                           showTime=FALSE, na_aware=FALSE, na_rm=FALSE)
 {
     # TODO: check if this value must be given or set ouside here
     # number of computed features per tau
-    num_of_features = 8
+    #num_of_features = 8
 
     # the length of the series
     m = ncol(X)
@@ -240,7 +240,9 @@ extractFeatureSingle = function(x, D=3, tau_l=1:10, na_aware=FALSE, na_rm=FALSE,
         #curdata = c(D, tau, sdEw, Hw, Cw, Fw, pst, Hpi, Cpi, Fpi)
         #curdata = c(sdEw, Hw, Cw, Fw, pst, Hpi, Cpi, Fpi)
         # NOTE: do not return D and tau
-        curdata = c(lenE, Hw, Cw, Fw, pst, Hpi, Cpi, Fpi)
+        #curdata = c(lenE, Hw, Cw, Fw, pst, Hpi, Cpi, Fpi)
+        curdata = c(Hw, Cw, Fw, pst, Hpi, Cpi, Fpi)
+        #curdata = c(Hw, Cw, pst, Hpi, Cpi)
 
         # TODO: check this:
         # making NA and NaN features values to be 0?
@@ -271,6 +273,122 @@ featuresPosAdjust = function(feats, num_of_features = 8)
 }
 
 
+
+plotFeatures = function(x, y, d_name, n_feats=8)
+{
+    # features labels
+    if (n_feats == 8)
+    {
+        colsexp = c(
+         expression(N[E]), 
+         expression(paste(H[S],'[',E[w],']')), 
+         expression(paste(C[JS],'[',E[w],']')), 
+         expression(paste(F,'[',E[w],']')), 
+         expression(p[st]), 
+         expression(paste(H[S],'[',p[pi],']')), 
+         expression(paste(C[JS],'[',p[pi],']')), 
+         expression(paste(F,'[',p[pi],']'))
+        )
+    } 
+    else
+    {
+        colsexp = paste('f', 1:n_feats, sep='')
+    }
+    
+    ################ DATASET NUMBERS
+
+    # the classes
+    classes = unique(y)
+
+    # number of classes
+    num_classes = length(classes)
+
+    ################ ANALYSIS OF FEATURES ###############
+
+    # number of considered features
+    #n_feats = 8
+
+    # number of total computed features 
+    m_feats = ncol(x)
+
+    # maximum number of tau
+    k = m_feats/n_feats
+
+    # preparing the mean features
+    x_mean = matrix(NA, nrow=num_classes, ncol=m_feats)
+    x_sd = matrix(NA, nrow=num_classes, ncol=m_feats)
+
+    # applying mean in train dataset
+    for(i in 1:num_classes)
+    {
+        x_mean[i,] = apply(x[y == classes[i],], 2, mean)
+        x_sd[i,] = apply(x[y == classes[i],], 2, sd)
+    }
+
+
+    # SAVING FIGURE
+
+    p = list()
+
+    myleg = NULL
+
+    ind = 1
+
+    # looping at each feature
+    for (i in seq(1, m_feats, by=k))
+    {
+        x_mean_i = x_mean[,i:(i-1+k)]
+        x_sd_i = x_sd[,i:(i-1+k)]
+
+        df = data.frame()
+
+        # preparing the data.frame
+        for(j in 1:num_classes)
+        {
+            df = rbind(df, data.frame(tau=1:k, feat=x_mean_i[j,], 
+                                      var=x_sd_i[j,], Classes=classes[j]))
+        }
+
+        df$Classes = as.factor(df$Classes)
+
+        # plotting each feature individually
+        p[[ind]] = ggplot(df, aes(x=tau, y=feat, colour=Classes, shape=Classes)) +
+            geom_point(size=2) + geom_line() + 
+            geom_errorbar(aes(ymin=feat-var, ymax=feat+var), width=.2,
+                 position=position_dodge(0.05)) +
+            theme_bw(base_size=22) +
+            theme(legend.position='bottom') +
+            xlab(expression(tau)) +
+            ylab(colsexp[ind]) +
+            guides(
+                    color=guide_legend(nrow=1, title.position="top", title.hjust=0.5),
+                    shape=guide_legend(nrow=1, title.position="top", title.hjust=0.5))
+
+
+        # adjusting only one legend
+        if (is.null(myleg))
+        {
+            tmp = ggplot_gtable(ggplot_build(p[[ind]]))
+            leg = which(sapply(tmp$grobs, function(x) x$name) == "guide-box")
+            myleg = tmp$grobs[[leg]]
+        }
+        
+        p[[ind]] = p[[ind]] + theme(legend.position='none')
+
+        ind = ind + 1
+    }
+
+    pall = grid.arrange(arrangeGrob(grobs=p, ncol=4), myleg, heights=c(10,1))
+
+    # saving the plot
+    ggsave(paste('img/fig_',d_name,'_features.pdf', sep=''), pall, width=16, height=7)
+
+
+}
+
+
+
+############################### OLD ##############################
 
 #library(FSelector)
 #library(stats)
