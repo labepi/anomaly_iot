@@ -28,10 +28,10 @@ library(caret)
 library(ggplot2)
 library(reshape2)
 # some plot libs
-suppressMessages(library(ggforce))
-suppressMessages(library(grid))
-suppressMessages(library(gridExtra))
-suppressMessages(library(factoextra))
+#suppressMessages(library(ggforce))
+#suppressMessages(library(grid))
+#suppressMessages(library(gridExtra))
+#suppressMessages(library(factoextra))
 
 # TODO: package for isolationForest
 #library(solitude)
@@ -313,7 +313,7 @@ for (d_name in d_name_l)
     
     ########### TODO:
     # testando a analise das features
-    plotFeatures(x_test, y_test, paste('antes-',d_name,'-', sep=''), num_of_features)
+    #plotFeatures(x_test, y_test, paste('antes-',d_name,'-', sep=''), num_of_features)
 
     ### TODO: ### TODO: ### TODO: ### TODO: ###
     # testando remover as features do numero de arestas
@@ -343,7 +343,7 @@ for (d_name in d_name_l)
     x_test  = predict(transform, x_test)
 
     # testando a analise das features
-    plotFeatures(x_test, y_test, paste('depois-',d_name,'-', sep=''), num_of_features)
+    #plotFeatures(x_test, y_test, paste('depois-',d_name,'-', sep=''), num_of_features)
 
     printdebug('Data scaled')
 
