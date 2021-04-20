@@ -33,7 +33,9 @@ suppressMessages(library(grid))
 suppressMessages(library(gridExtra))
 suppressMessages(library(factoextra))
 
-
+# TODO: package for isolationForest
+#library(solitude)
+library(isotree)
 
 printdebug('Loaded libraries and functions')
 
@@ -200,8 +202,8 @@ d_name_l = c(
 # 'HpHp_L5_magnitude',
 # mirai
 # 'HH_L5_radius', 
- 'MI_dir_L5_variance',
- 'HH_L5_covariance',
+# 'MI_dir_L5_variance',
+# 'HH_L5_covariance',
 ## 'HpHp_L5_pcc',
  'HH_L5_magnitude',
  'MI_dir_L5_weight',
@@ -351,13 +353,96 @@ for (d_name in d_name_l)
     ##################################################
     ##################################################
 
-    # computing model
-    model[[i]] = svm(x_train, y_train, 
-                   type='one-classification', 
-                   kernel='linear')
-                   #cross=5) #train an one-classification model 
     
-    print(summary(model[[i]]))
+    #set.seed(1)
+
+    ### Fit a small isolation forest model
+    model[[i]] = isolation.forest(x_train, ntrees = 500, nthreads = 1)
+
+    pred_train =  predict(model[[i]], x_train)
+    #cat("Point with highest outlier score: ",
+    #x_train[which.max(pred), ], "\n")
+
+    print(pred_train)
+    print(mean(pred_train))
+    print(median(pred_train))
+    print(sd(pred_train))
+    print(mad(pred_train))
+    
+    #max_pred = max(pred_train)+sd(pred_train)
+    max_pred = mean(pred_train) + 2*sd(pred_train)
+
+    cat('max_pred: ',max_pred,'\n')
+    
+    #print('----')
+
+    #pred2 <- predict(iso, x_test)
+    #print(pred2)
+    #print(pred2>max_pred)
+
+    # solitude
+
+##    # create isolation forest using isolationForest function from
+##    # solitude package with default parameters
+##    #iforest <- isolationForest$new(sample_size = ncol(x_train))
+##
+##
+##    # initiate an isolation forest
+##    iso = isolationForest$new(sample_size = nrow(x_train))
+##
+##    print('OK1')
+##
+##    # fit for attrition data
+##    iso$fit(x_train)
+##
+##    print('ok2')
+##    
+##    # Obtain anomaly scores
+##    scores_train = iso$predict(x_train)
+##    scores_train[order(anomaly_score, decreasing = TRUE)]
+##
+##    print(scores_train)
+##
+##    # predict scores for unseen data (50% sample)
+##    scores_unseen = iso$predict(x_test)
+##    scores_unseen[order(anomaly_score, decreasing = TRUE)]
+##
+##    print(scores_unseen)
+##    
+##    ##predict outliers within dataset
+##    #pred <- predict(iforest, x_test, type = "anomaly_score")
+##    #outlier <- as.factor(ifelse(pred >=0.50, "outlier", "normal"))
+##
+##    #print(pred)
+##    #print('-----')
+##    #print(outlier)
+##
+
+# TODO: for the svm tests
+#    quit()
+#    
+#    # computing model
+#    model[[i]] = svm(x_train, y_train, 
+#                   type='one-classification', 
+#                   #type='nu-classification', 
+#                   #kernel='sigmoid')
+#                   #kernel='radial')
+#                   kernel='linear',
+#                   # cost=1, # 10
+#                   nu=0.5)
+#                   #nu=0.05)
+#                   #cross=5) #train an one-classification model 
+#    
+#    print(summary(model[[i]]))
+
+#    svm.tune <- tune(svm, x_train, y_train, kernel = "linear",
+#                     type='one-classification',
+#                  ranges = list(cost = c(0.001, 0.5, 1, 10)))
+
+#    print(svm.tune)
+#    quit()
+
+
     
     # TODO: test more kernels
     # TODO: try tuning svm parameters 
@@ -378,6 +463,12 @@ for (d_name in d_name_l)
 
     # predicting on x_test
     res[[i]] = predict(model[[i]], x_test)
+
+    print(res[[i]])
+    
+    # TODO: for isolation.forest
+    res[[i]] = res[[i]] < max_pred
+    #res[[i]] = res[[i]] < 0.59
 
     res[[i]] = as.numeric(res[[i]])
 
@@ -438,19 +529,19 @@ res_M = matrix(unlist(res, use.names=F), ncol=ncols, byrow=T)
 
 # TODO: 100% aqui
 
-res_attack = apply(res_M, 2, function(x) sum(x == 1)) > 0
-# all is attack, until...
-res_all = rep(0, ncols)
-res_all[res_attack] = 1
+#res_attack = apply(res_M, 2, function(x) sum(x == 1)) > 0
+## all is attack, until...
+#res_all = rep(0, ncols)
+#res_all[res_attack] = 1
 
 #############
 # testing for voting scheme
 #############
 
-#res_attack = apply(res_M, 2, function(x) sum(x == 1)) > ceiling(nrow(res_M)/2)
+res_attack = apply(res_M, 2, function(x) sum(x == 1)) >= ceiling(nrow(res_M)/2)
 ## all is attack, until...
-#res_all = rep(0, ncols)
-#res_all[res_attack] = 1
+res_all = rep(0, ncols)
+res_all[res_attack] = 1
 
 
 print(res_all)
