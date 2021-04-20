@@ -217,8 +217,11 @@ d_name_l = c(
 # "HpHp_L0.01_covariance",
 # "MI_dir_L5_weight",
 # "H_L5_weight"
-
 )
+
+# TODO: testando todas as L5 features
+d_name_l = read.csv('data/botnet/demonstrate_structure.csv', header=F)
+d_name_l = d_name_l[grepl('L5', d_name_l)]
 
 # multiple models
 model = list()
@@ -476,7 +479,7 @@ for (d_name in d_name_l)
 
     # confusion matrix
     cm = confusionMatrix(table(y_test,res[[i]]))
-    printdebug(paste('OVERALL accuracy: ', d_name, cm$overall['Accuracy']))
+    printdebug(paste('OVERALL accuracy feat: ', d_name, cm$overall['Accuracy']))
     #output1 = paste('FINAL_ACC', cm$overall['Accuracy'])
 
     print(cm)
