@@ -366,16 +366,21 @@ for (d_name in d_name_l)
     #cat("Point with highest outlier score: ",
     #x_train[which.max(pred), ], "\n")
 
-    print(pred_train)
-    print(mean(pred_train))
-    print(median(pred_train))
-    print(sd(pred_train))
-    print(mad(pred_train))
+    cat("pred: ",pred_train,'\n')
+    cat("mean: ",mean(pred_train),'\n')
+    cat("median: ",median(pred_train),'\n')
+    cat("sd: ",sd(pred_train),'\n')
+    cat("mad: ",mad(pred_train),'\n')
     
     #max_pred = max(pred_train)+sd(pred_train)
-    max_pred = mean(pred_train) + 2*sd(pred_train)
+    #max_pred = mean(pred_train) + 2*sd(pred_train)  #<- <- <- 
+    #max_pred = mean(pred_train) + sd(pred_train)
+    max_pred = median(pred_train) + 2*sd(pred_train)
 
-    cat('max_pred: ',max_pred,'\n')
+    cat('max_pred1: ',mean(pred_train) + 2*sd(pred_train),'\n')
+    cat('max_pred2: ',median(pred_train) + 2*mad(pred_train),'\n')
+    cat('max_pred3: ',mean(pred_train) + sd(pred_train),'\n')
+    cat('max_pred4: ',median(pred_train) + 2*sd(pred_train),'\n')
     
     #print('----')
 
