@@ -174,8 +174,8 @@ dataset_path = './data/botnet/original'
 
 # number of computed features per tau
 #num_of_features = 5
-num_of_features = 7
-#num_of_features = 8
+#num_of_features = 7
+num_of_features = 8
 
 
 # LOADING BENIGN DATA
@@ -230,6 +230,9 @@ model = list()
 res = list()
 
 i = 0
+
+# preparing the parameters for confusion matrix 
+l_s = c("1", "0")
 
 # multi features classifiers
 for (d_name in d_name_l)
@@ -380,7 +383,7 @@ for (d_name in d_name_l)
     cat('max_pred1: ',mean(pred_train) + 2*sd(pred_train),'\n')
     cat('max_pred2: ',median(pred_train) + 2*mad(pred_train),'\n')
     cat('max_pred3: ',mean(pred_train) + sd(pred_train),'\n')
-    cat('max_pred4: ',median(pred_train) + 2*sd(pred_train),'\n')
+    cat('!max_pred4: ',median(pred_train) + 2*sd(pred_train),'\n')
     
     #print('----')
 
@@ -482,8 +485,12 @@ for (d_name in d_name_l)
 
     printdebug(paste('Predicted test:', paste(y_test, res[[i]], sep='-', collapse=',')))
 
+    print(factor(res[[i]], l_s))
+    print(factor(y_test, l_s))
+
     # confusion matrix
-    cm = confusionMatrix(table(y_test,res[[i]]))
+    #cm = confusionMatrix(table(y_test,res[[i]]))
+    cm = confusionMatrix(factor(res[[i]], l_s),factor(y_test, l_s))
     printdebug(paste('OVERALL accuracy feat: ', d_name, cm$overall['Accuracy']))
     #output1 = paste('FINAL_ACC', cm$overall['Accuracy'])
 
@@ -554,7 +561,7 @@ res_all[res_attack] = 1
 
 print(res_all)
 
-cm = confusionMatrix(table(y_test,res_all))
+cm = confusionMatrix(factor(res_all, l_s),factor(y_test, l_s))
 
 print(cm)
 
