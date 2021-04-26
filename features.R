@@ -240,8 +240,8 @@ extractFeatureSingle = function(x, D=3, tau_l=1:10, na_aware=FALSE, na_rm=FALSE,
         #curdata = c(D, tau, sdEw, Hw, Cw, Fw, pst, Hpi, Cpi, Fpi)
         #curdata = c(sdEw, Hw, Cw, Fw, pst, Hpi, Cpi, Fpi)
         # NOTE: do not return D and tau
-        curdata = c(lenE, Hw, Cw, Fw, pst, Hpi, Cpi, Fpi)
-        #curdata = c(Hw, Cw, Fw, pst, Hpi, Cpi, Fpi)
+        #curdata = c(lenE, Hw, Cw, Fw, pst, Hpi, Cpi, Fpi)
+        curdata = c(Hw, Cw, Fw, pst, Hpi, Cpi, Fpi)
         #curdata = c(Hw, Cw, pst, Hpi, Cpi)
 
         # TODO: check this:

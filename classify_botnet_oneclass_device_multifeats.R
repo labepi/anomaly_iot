@@ -174,8 +174,8 @@ dataset_path = './data/botnet/original'
 
 # number of computed features per tau
 #num_of_features = 5
-#num_of_features = 7
-num_of_features = 8
+num_of_features = 7
+#num_of_features = 8
 
 
 # LOADING BENIGN DATA
