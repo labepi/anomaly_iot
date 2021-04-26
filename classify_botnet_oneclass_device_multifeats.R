@@ -174,8 +174,8 @@ dataset_path = './data/botnet/original'
 
 # number of computed features per tau
 #num_of_features = 5
-num_of_features = 7
-#num_of_features = 8
+#num_of_features = 7
+num_of_features = 8
 
 
 # LOADING BENIGN DATA
@@ -221,7 +221,10 @@ d_name_l = c(
 
 # TODO: testando todas as L5 features
 d_name_l = read.csv('data/botnet/demonstrate_structure.csv', header=F)
+# filtering only L5 features
 d_name_l = d_name_l[grepl('L5', d_name_l)]
+# filtering only MI features
+d_name_l = d_name_l[grepl('MI', d_name_l)]
 
 # multiple models
 model = list()
