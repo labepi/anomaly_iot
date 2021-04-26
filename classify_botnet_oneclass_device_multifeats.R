@@ -376,14 +376,16 @@ for (d_name in d_name_l)
     cat("mad: ",mad(pred_train),'\n')
     
     #max_pred = max(pred_train)+sd(pred_train)
-    #max_pred = mean(pred_train) + 2*sd(pred_train)  #<- <- <- 
+    max_pred = mean(pred_train) + 2*sd(pred_train)  #<- <- <- 
+    #max_pred = median(pred_train) + 2*mad(pred_train)
     #max_pred = mean(pred_train) + sd(pred_train)
-    max_pred = median(pred_train) + 2*sd(pred_train)
+    #max_pred = median(pred_train) + 2*sd(pred_train)
 
-    cat('max_pred1: ',mean(pred_train) + 2*sd(pred_train),'\n')
+    cat('max_pred0: ',max(pred_train) + sd(pred_train),'\n')
+    cat('!max_pred1: ',mean(pred_train) + 2*sd(pred_train),'\n')
     cat('max_pred2: ',median(pred_train) + 2*mad(pred_train),'\n')
     cat('max_pred3: ',mean(pred_train) + sd(pred_train),'\n')
-    cat('!max_pred4: ',median(pred_train) + 2*sd(pred_train),'\n')
+    cat('max_pred4: ',median(pred_train) + 2*sd(pred_train),'\n')
     
     #print('----')
 
