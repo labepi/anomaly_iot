@@ -222,9 +222,11 @@ d_name_l = c(
 # TODO: testando todas as L5 features
 d_name_l = read.csv('data/botnet/demonstrate_structure.csv', header=F)
 # filtering only L5 features
-d_name_l = d_name_l[grepl('L5', d_name_l)]
+#d_name_l = d_name_l[grepl('L5', d_name_l)]
 # filtering only MI features
-d_name_l = d_name_l[grepl('MI', d_name_l)]
+#d_name_l = d_name_l[grepl('MI_dir_L5', d_name_l)]
+# filtering only MI features
+d_name_l = d_name_l[grepl('^H_L5', d_name_l)]
 
 # multiple models
 model = list()
