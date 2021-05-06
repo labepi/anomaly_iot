@@ -13,8 +13,8 @@ featureAsDataset = function(x, series_len, label=1)
     # number of rows, or if truncate the series and reduce one row
 
     # organizing the feature as a matrix
-    #df = matrix(x[1:(nrows*series_len)], byrow=T, ncol=series_len)
-    df = matrix(x, byrow=T, ncol=series_len)
+    df = matrix(x[1:(nrows*series_len)], byrow=T, ncol=series_len)
+    #df = matrix(x, byrow=T, ncol=series_len)
 
     # TODO: check if this is necessary
     # adding the label columns

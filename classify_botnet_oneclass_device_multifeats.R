@@ -37,6 +37,12 @@ library(reshape2)
 #library(solitude)
 library(isotree)
 
+# extended isolation forest
+#library(eif)
+
+#
+#library(Rlof)
+
 printdebug('Loaded libraries and functions')
 
 
@@ -224,9 +230,9 @@ d_name_l = read.csv('data/botnet/demonstrate_structure.csv', header=F)
 # filtering only L5 features
 #d_name_l = d_name_l[grepl('L5', d_name_l)]
 # filtering only MI features
-#d_name_l = d_name_l[grepl('MI_dir_L5', d_name_l)]
+d_name_l = d_name_l[grepl('MI_dir_L5', d_name_l)]
 # filtering only MI features
-d_name_l = d_name_l[grepl('^H_L5', d_name_l)]
+#d_name_l = d_name_l[grepl('^H_L5', d_name_l)]
 
 # multiple models
 model = list()
@@ -300,10 +306,14 @@ for (d_name in d_name_l)
     # BENIGN DATA
     #############
 
+    #TODO: maybe select these train samples randomly?
+    
     ## define the split rate
     #id_train = createDataPartition(y=y_all, p=train_pct, list=FALSE)
     # NOTE: using half the time series for training on benign data
-    id_train = 1:round(nrow(x_all)/2)
+    #id_train = 1:round(nrow(x_all)/2)
+    # NOTE: using 2/3 for train and 1/3 for test
+    id_train = 1:round((2/3)*nrow(x_all))
 
     # Splitting datasets
     x_train = x_all[id_train,]
@@ -368,7 +378,37 @@ for (d_name in d_name_l)
     #set.seed(1)
 
     ### Fit a small isolation forest model
-    model[[i]] = isolation.forest(x_train, ntrees = 500, nthreads = 1)
+    #model[[i]] = isolation.forest(x_train, ntrees = 500, nthreads = 1)
+    model[[i]] = isolation.forest(x_train, ntrees = 1000, nthreads = 1)
+
+    print(model[[i]])
+    
+    print(summary(model[[i]]))
+
+    print('------------')
+    
+    #print('EIF')
+    #df.eif = eif(x_train, ntrees = 200, sample_size = 20, ExtensionLevel = 1)
+    #print(df.eif)
+    #print('------------')
+   
+    ## LOF
+    #print('TRAIN')
+    #df.lof = lof(x_train, k=5)
+    #print(df.lof)
+
+    #print('TEST')
+    #x_test2 = x_test[1:5,]
+    #
+    #myk = nrow(x_all)-length(id_train)
+    ##x_train = x_all[id_train,]
+    #df.lof = lof(x_test, k=myk-2)
+    #print(df.lof)
+    #
+    #print('TEST SCALED')
+    #print((df.lof-mean(df.lof))/sd(df.lof))
+
+    #print('------------')
 
     pred_train =  predict(model[[i]], x_train)
     #cat("Point with highest outlier score: ",
@@ -379,18 +419,24 @@ for (d_name in d_name_l)
     cat("median: ",median(pred_train),'\n')
     cat("sd: ",sd(pred_train),'\n')
     cat("mad: ",mad(pred_train),'\n')
+
+    golden_ratio = 1.618
     
     #max_pred = max(pred_train)+sd(pred_train)
-    max_pred = mean(pred_train) + 2*sd(pred_train)  #<- <- <- 
+    #max_pred = mean(pred_train) + 2*sd(pred_train)  #<- <- <- 
     #max_pred = median(pred_train) + 2*mad(pred_train)
     #max_pred = mean(pred_train) + sd(pred_train)
     #max_pred = median(pred_train) + 2*sd(pred_train)
+    #max_pred = mean(pred_train)*golden_ratio   
+    max_pred = 0.7 #mean(pred_train) + 2*sd(pred_train)
 
-    cat('max_pred0: ',max(pred_train) + sd(pred_train),'\n')
-    cat('!max_pred1: ',mean(pred_train) + 2*sd(pred_train),'\n')
-    cat('max_pred2: ',median(pred_train) + 2*mad(pred_train),'\n')
-    cat('max_pred3: ',mean(pred_train) + sd(pred_train),'\n')
-    cat('max_pred4: ',median(pred_train) + 2*sd(pred_train),'\n')
+    cat('max_pred0: ',max(pred_train) + sd(pred_train),'(max+sd)\n')
+    cat('max_pred1: ',mean(pred_train) + 2*sd(pred_train),'(mean+2sd)\n')
+    cat('max_pred2: ',median(pred_train) + 2*mad(pred_train),'(median+2mad)\n')
+    cat('max_pred3: ',mean(pred_train) + sd(pred_train),'(mean+sd)\n')
+    cat('max_pred4: ',median(pred_train) + 2*sd(pred_train),'(median+2sd)\n')
+    cat('max_pred5: ',mean(pred_train)*golden_ratio,' (golden)\n')
+    cat('!max_pred6: ',0.7,' (fixed)\n')
     
     #print('----')
 
