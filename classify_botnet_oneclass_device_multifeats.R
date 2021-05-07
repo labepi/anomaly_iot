@@ -259,7 +259,7 @@ for (d_name in d_name_l)
 
     # transforming a single feature vector in a dataset
     # organizing the feature as a matrix
-    x_ben_df = featureAsDataset(x_ben_feat, series_len, label=1)
+    x_ben_df = featureAsDataset(x_ben_feat, series_len, label=1, skip=100)
 
     # removing class column from dataset matrix
     y_ben_df = x_ben_df[,ncol(x_ben_df)]
@@ -286,7 +286,7 @@ for (d_name in d_name_l)
     # attacks
 
     # formatting dataset of series_len time series length
-    x_att_df = featureAsDataset(x_att_feat, series_len, label=0)
+    x_att_df = featureAsDataset(x_att_feat, series_len, label=0, skip=100)
 
     # removing class column from dataset matrix
     y_att_df = x_att_df[,ncol(x_att_df)]
@@ -423,20 +423,20 @@ for (d_name in d_name_l)
     golden_ratio = 1.618
     
     #max_pred = max(pred_train)+sd(pred_train)
-    #max_pred = mean(pred_train) + 2*sd(pred_train)  #<- <- <- 
+    max_pred = mean(pred_train) + 2*sd(pred_train)  #<- <- <- 
     #max_pred = median(pred_train) + 2*mad(pred_train)
     #max_pred = mean(pred_train) + sd(pred_train)
     #max_pred = median(pred_train) + 2*sd(pred_train)
     #max_pred = mean(pred_train)*golden_ratio   
-    max_pred = 0.6 #mean(pred_train) + 2*sd(pred_train)
+    #max_pred = 0.6 #mean(pred_train) + 2*sd(pred_train) #<<<< ese é muito bom, erra apenas 1
 
     cat('max_pred0: ',max(pred_train) + sd(pred_train),'(max+sd)\n')
-    cat('max_pred1: ',mean(pred_train) + 2*sd(pred_train),'(mean+2sd)\n')
+    cat('!max_pred1: ',mean(pred_train) + 2*sd(pred_train),'(mean+2sd)\n')
     cat('max_pred2: ',median(pred_train) + 2*mad(pred_train),'(median+2mad)\n')
     cat('max_pred3: ',mean(pred_train) + sd(pred_train),'(mean+sd)\n')
     cat('max_pred4: ',median(pred_train) + 2*sd(pred_train),'(median+2sd)\n')
     cat('max_pred5: ',mean(pred_train)*golden_ratio,' (golden)\n')
-    cat('!max_pred6: ',0.6,' (fixed)\n')
+    cat('max_pred6: ',0.6,' (fixed)\n')
     
     #print('----')
 
