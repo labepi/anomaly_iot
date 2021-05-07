@@ -423,20 +423,20 @@ for (d_name in d_name_l)
     golden_ratio = 1.618
     
     #max_pred = max(pred_train)+sd(pred_train)
-    max_pred = mean(pred_train) + 2*sd(pred_train)  #<- <- <- 
+    #max_pred = mean(pred_train) + 2*sd(pred_train)  #<- <- <- 
     #max_pred = median(pred_train) + 2*mad(pred_train)
     #max_pred = mean(pred_train) + sd(pred_train)
     #max_pred = median(pred_train) + 2*sd(pred_train)
     #max_pred = mean(pred_train)*golden_ratio   
-    #max_pred = 0.6 #mean(pred_train) + 2*sd(pred_train) #<<<< ese é muito bom, erra apenas 1
+    max_pred = 0.6 #<<<< ese é muito bom, erra apenas 1
 
     cat('max_pred0: ',max(pred_train) + sd(pred_train),'(max+sd)\n')
-    cat('!max_pred1: ',mean(pred_train) + 2*sd(pred_train),'(mean+2sd)\n')
+    cat('max_pred1: ',mean(pred_train) + 2*sd(pred_train),'(mean+2sd)\n')
     cat('max_pred2: ',median(pred_train) + 2*mad(pred_train),'(median+2mad)\n')
     cat('max_pred3: ',mean(pred_train) + sd(pred_train),'(mean+sd)\n')
     cat('max_pred4: ',median(pred_train) + 2*sd(pred_train),'(median+2sd)\n')
     cat('max_pred5: ',mean(pred_train)*golden_ratio,' (golden)\n')
-    cat('max_pred6: ',0.6,' (fixed)\n')
+    cat('!max_pred6: ',0.6,' (fixed)\n')
     
     #print('----')
 
