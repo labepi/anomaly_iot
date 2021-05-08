@@ -381,8 +381,8 @@ for (d_name in d_name_l)
     #set.seed(1)
 
     ### Fit a small isolation forest model
-    model[[i]] = isolation.forest(x_train, ntrees = 200, nthreads = 1)
-    #model[[i]] = isolation.forest(x_train, ntrees = 500, nthreads = 1)
+    #model[[i]] = isolation.forest(x_train, ntrees = 200, nthreads = 1)
+    model[[i]] = isolation.forest(x_train, ntrees = 500, nthreads = 1)
     #model[[i]] = isolation.forest(x_train, ntrees = 1000, nthreads = 1)
 
     print(model[[i]])
@@ -443,7 +443,7 @@ for (d_name in d_name_l)
     cat('max_pred4: ',median(pred_train) + 2*sd(pred_train),'(median+2sd)\n')
     cat('max_pred5: ',mean(pred_train)*golden_ratio,' (golden)\n')
     cat('!max_pred6: ',0.6,' (fixed)\n')
-    cat('max_pred7:',mean(pred_train)+mean(pred_train)*euler,' (euler)')
+    cat('max_pred7:',mean(pred_train)+mean(pred_train)*euler,' (euler)\n')
     
     #print('----')
 
@@ -535,6 +535,7 @@ for (d_name in d_name_l)
     # predicting on x_test
     res[[i]] = predict(model[[i]], x_test)
 
+    print('PRED:')
     print(res[[i]])
     
     # TODO: for isolation.forest
