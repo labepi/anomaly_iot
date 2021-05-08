@@ -230,7 +230,8 @@ d_name_l = read.csv('data/botnet/demonstrate_structure.csv', header=F)
 # filtering only L5 features
 #d_name_l = d_name_l[grepl('L5', d_name_l)]
 # filtering only MI features
-d_name_l = d_name_l[grepl('MI_dir_L5', d_name_l)]
+#d_name_l = d_name_l[grepl('MI_dir_L5', d_name_l)]
+d_name_l = d_name_l[grepl('MI_dir_L5_wei', d_name_l)]
 # filtering only MI features
 #d_name_l = d_name_l[grepl('^H_L5', d_name_l)]
 
@@ -562,8 +563,8 @@ for (d_name in d_name_l)
 
 print(res)
 print(length(res))
-print(length(res[[1]]))
-print(length(res[[2]]))
+#print(length(res[[1]]))
+#print(length(res[[2]]))
 
 #quit()
 
