@@ -382,7 +382,8 @@ for (d_name in d_name_l)
 
     ### Fit a small isolation forest model
     #model[[i]] = isolation.forest(x_train, ntrees = 200, nthreads = 1)
-    model[[i]] = isolation.forest(x_train, ntrees = 500, nthreads = 1)
+    model[[i]] = isolation.forest(x_train, ntrees = 300, nthreads = 1)
+    #model[[i]] = isolation.forest(x_train, ntrees = 500, nthreads = 1)
     #model[[i]] = isolation.forest(x_train, ntrees = 1000, nthreads = 1)
 
     print(model[[i]])
