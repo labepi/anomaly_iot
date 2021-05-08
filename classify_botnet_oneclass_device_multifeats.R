@@ -245,6 +245,9 @@ i = 0
 # preparing the parameters for confusion matrix 
 l_s = c("1", "0")
 
+# number of initial observations to skip
+skip=0
+
 # multi features classifiers
 for (d_name in d_name_l)
 {
@@ -259,7 +262,7 @@ for (d_name in d_name_l)
 
     # transforming a single feature vector in a dataset
     # organizing the feature as a matrix
-    x_ben_df = featureAsDataset(x_ben_feat, series_len, label=1, skip=100)
+    x_ben_df = featureAsDataset(x_ben_feat, series_len, label=1, skip=skip)
 
     # removing class column from dataset matrix
     y_ben_df = x_ben_df[,ncol(x_ben_df)]
@@ -286,7 +289,7 @@ for (d_name in d_name_l)
     # attacks
 
     # formatting dataset of series_len time series length
-    x_att_df = featureAsDataset(x_att_feat, series_len, label=0, skip=100)
+    x_att_df = featureAsDataset(x_att_feat, series_len, label=0, skip=skip)
 
     # removing class column from dataset matrix
     y_att_df = x_att_df[,ncol(x_att_df)]
