@@ -378,8 +378,9 @@ for (d_name in d_name_l)
     #set.seed(1)
 
     ### Fit a small isolation forest model
+    model[[i]] = isolation.forest(x_train, ntrees = 200, nthreads = 1)
     #model[[i]] = isolation.forest(x_train, ntrees = 500, nthreads = 1)
-    model[[i]] = isolation.forest(x_train, ntrees = 1000, nthreads = 1)
+    #model[[i]] = isolation.forest(x_train, ntrees = 1000, nthreads = 1)
 
     print(model[[i]])
     
@@ -421,6 +422,7 @@ for (d_name in d_name_l)
     cat("mad: ",mad(pred_train),'\n')
 
     golden_ratio = 1.618
+    euler = 0.5772156649
     
     #max_pred = max(pred_train)+sd(pred_train)
     #max_pred = mean(pred_train) + 2*sd(pred_train)  #<- <- <- 
@@ -429,6 +431,7 @@ for (d_name in d_name_l)
     #max_pred = median(pred_train) + 2*sd(pred_train)
     #max_pred = mean(pred_train)*golden_ratio   
     max_pred = 0.6 #<<<< ese é muito bom, erra apenas 1
+    #max_pred = mean(pred_train)+mean(pred_train)*euler   
 
     cat('max_pred0: ',max(pred_train) + sd(pred_train),'(max+sd)\n')
     cat('max_pred1: ',mean(pred_train) + 2*sd(pred_train),'(mean+2sd)\n')
@@ -437,6 +440,7 @@ for (d_name in d_name_l)
     cat('max_pred4: ',median(pred_train) + 2*sd(pred_train),'(median+2sd)\n')
     cat('max_pred5: ',mean(pred_train)*golden_ratio,' (golden)\n')
     cat('!max_pred6: ',0.6,' (fixed)\n')
+    cat('max_pred7:',mean(pred_train)+mean(pred_train)*euler,' (euler)')
     
     #print('----')
 
