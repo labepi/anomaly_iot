@@ -262,16 +262,61 @@ print(dim(x_all_train))
 print(dim(x_all_test))
 
 
+# LOADING ATTACK DATA FROM ALL DEVICES
+######################################
+
+for (device in dev_names)
+{
+    # according to f_names
+    for(attack in 2:11)
+    {
+    
+        ################ LOADING ATTACK DATA ###############
+    
+        x_att = read.csv(paste(dataset_path, '/', device, '/', f_names[attack,1], '.csv', sep=''))
+
+        # filtering by a single feature
+        x_att_feat = x_att[,d_name]
+
+        # TODO: here the label may change for separating different types of
+        # attacks
+
+        # formatting dataset of series_len time series length
+        x_att_df = featureAsDataset(x_att_feat, series_len, label=0, skip=skip)
+
+        # removing class column from dataset matrix
+        y_att_df = x_att_df[,ncol(x_att_df)]
+        x_att_df = x_att_df[,-ncol(x_att_df)]
+
+        #print(dim(x_att_df))
+
+        ################ COMPUTING FEATURES ###############
+
+        # computing features for the whole dataset, for all time series
+        x_all_att = extractFeatures(x_att_df, D, tau_l, num_of_features, 
+                                    showTime=FALSE, na_aware=FALSE, na_rm=FALSE)
+
+        # all classes
+        y_all_att = y_att_df
+
+        ################ SPLIT TRAIN/TEST ###############
+
+        ################ ADDING TO GENERAL DATASET ###############
+
+        # NOTE: all attack data is going to test
+        x_all_test = rbind(x_all_test, x_all_att)
+        y_all_test = c(y_all_test, y_all_att)
+
+
+    }
+}
+
+print(dim(x_all_test))
+
 quit()
 
 
-# LOADING ATTACK DATA
-######################
 
-# these are prepared botnet data, from N-BaIoT
-#x_att = read.csv(paste(dataset_path, '/', device, '/', f_names[2,1], '.csv', sep=''))
-#x_att = read.csv(paste(dataset_path, '/', device, '/', f_names[11,1], '.csv', sep=''))
-x_att = read.csv(paste(dataset_path, '/', device, '/', f_names[attack,1], '.csv', sep=''))
 
 
 

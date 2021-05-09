@@ -4,7 +4,7 @@
 # organizing the feature as a matrix
 featureAsDataset = function(x, series_len, label=1, skip=0)
 {
-    cat('LEN X 1:',length(x),'\n')
+    #cat('LEN X 1:',length(x),'\n')
 
     # nuumber of first measures to skip
     if (skip > 0)
@@ -12,7 +12,7 @@ featureAsDataset = function(x, series_len, label=1, skip=0)
         x = x[(skip+1):length(x)]
     }
     
-    cat('LEN X 2:',length(x),'\n')
+    #cat('LEN X 2:',length(x),'\n')
 
     # number of rows in the dataset
     nrows = floor(length(x)/series_len)
