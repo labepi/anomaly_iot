@@ -264,6 +264,7 @@ for (device in dev_names)
     x_all_test = rbind(x_all_test, x_test_tmp)
     y_all_test = c(y_all_test, y_test_tmp)
 
+    printdebug(paste('LOADED BENIGN:',device))
 }
 
 #quit()
@@ -324,6 +325,7 @@ for (device in dev_names)
         x_all_test = rbind(x_all_test, x_all_att)
         y_all_test = c(y_all_test, y_all_att)
 
+        printdebug(paste('LOADED ATTACK:',device,'-',f_names[attack,1]))
 
     }
 }
@@ -331,7 +333,7 @@ for (device in dev_names)
 print(dim(x_all_train))
 print(dim(x_all_test))
 
-quit()
+#quit()
 
 ################ SCALING DATA ###############
 
@@ -346,47 +348,101 @@ x_all_test  = predict(transform, x_all_test)
 
 
 
+###############################################
+################ CLASSIFICATION ###############
+###############################################
+
+max_pred = 0.59
+
+################ TRAINING PHASE ###############
+
+
+# Fit a small isolation forest model
+#model[[i]] = isolation.forest(x_train, ntrees = 200, nthreads = 1)
+model = isolation.forest(x_all_train, ntrees = 300, nthreads = 1)
+#model[[i]] = isolation.forest(x_train, ntrees = 500, nthreads = 1)
+#model[[i]] = isolation.forest(x_train, ntrees = 1000, nthreads = 1)
+
+print(model)
+print(summary(model))
+
+
+################ TESTING PHASE ###############
+
+
+# testing the tunned parameters
+
+
+# predicting on x_test
+res = predict(model, x_all_test)
+
+print('PRED:')
+print(res)
+
+# TODO: for isolation.forest
+
+# benign is 1 and attack is 0
+res = res < max_pred
+res = as.numeric(res)
+
+printdebug(paste('Predicted test:', paste(y_all_test, res, sep='-', collapse=',')))
+
+#print(factor(res[[i]], l_s))
+#print(factor(y_test, l_s))
+
+# preparing the parameters for confusion matrix 
+l_s = c("1", "0")
+
+# confusion matrix
+cm = confusionMatrix(factor(res, l_s),factor(y_all_test, l_s))
+printdebug(paste('OVERALL accuracy feat: ', cm$overall['Accuracy']))
+
+print(cm)
 
 
 
-d_name_l = c(
-#    'MI_dir_L5_weight',
-#    'H_L5_weight'
-# 'HpHp_L5_magnitude',
-# mirai
-# 'HH_L5_radius', 
-# 'MI_dir_L5_variance',
-# 'HH_L5_covariance',
-## 'HpHp_L5_pcc',
- 'HH_L5_magnitude',
- 'MI_dir_L5_weight',
- 'H_L5_weight'
-# bashlite
-# "MI_dir_L3_variance",
-# "HH_jit_L1_mean",
-## "HpHp_L1_magnitude",
-# "HH_L0.1_std",
-## "HH_L5_magnitude",
-# "HpHp_L0.01_covariance",
-# "MI_dir_L5_weight",
-# "H_L5_weight"
-)
+quit()
 
-# TODO: testando todas as L5 features
-d_name_l = read.csv('data/botnet/demonstrate_structure.csv', header=F)
-# filtering only L5 features
-#d_name_l = d_name_l[grepl('L5', d_name_l)]
-# filtering only MI features
-#d_name_l = d_name_l[grepl('MI_dir_L5', d_name_l)]
-d_name_l = d_name_l[grepl('MI_dir_L5_weight', d_name_l)]
-# filtering only MI features
-#d_name_l = d_name_l[grepl('^H_L5', d_name_l)]
 
-# multiple models
-model = list()
 
-# the classification results
-res = list()
+#d_name_l = c(
+##    'MI_dir_L5_weight',
+##    'H_L5_weight'
+## 'HpHp_L5_magnitude',
+## mirai
+## 'HH_L5_radius', 
+## 'MI_dir_L5_variance',
+## 'HH_L5_covariance',
+### 'HpHp_L5_pcc',
+# 'HH_L5_magnitude',
+# 'MI_dir_L5_weight',
+# 'H_L5_weight'
+## bashlite
+## "MI_dir_L3_variance",
+## "HH_jit_L1_mean",
+### "HpHp_L1_magnitude",
+## "HH_L0.1_std",
+### "HH_L5_magnitude",
+## "HpHp_L0.01_covariance",
+## "MI_dir_L5_weight",
+## "H_L5_weight"
+#)
+#
+## TODO: testando todas as L5 features
+#d_name_l = read.csv('data/botnet/demonstrate_structure.csv', header=F)
+## filtering only L5 features
+##d_name_l = d_name_l[grepl('L5', d_name_l)]
+## filtering only MI features
+##d_name_l = d_name_l[grepl('MI_dir_L5', d_name_l)]
+#d_name_l = d_name_l[grepl('MI_dir_L5_weight', d_name_l)]
+## filtering only MI features
+##d_name_l = d_name_l[grepl('^H_L5', d_name_l)]
+#
+## multiple models
+#model = list()
+#
+## the classification results
+#res = list()
 
 i = 0
 
@@ -402,87 +458,6 @@ for (d_name in d_name_l)
     # the model index
     i = i + 1
 
-    # BENIGN DATA
-    #############
-
-    # filtering by a single feature
-    x_ben_feat = x_ben[,d_name]
-
-    # transforming a single feature vector in a dataset
-    # organizing the feature as a matrix
-    x_ben_df = featureAsDataset(x_ben_feat, series_len, label=1, skip=skip)
-
-    # removing class column from dataset matrix
-    y_ben_df = x_ben_df[,ncol(x_ben_df)]
-    x_ben_df = x_ben_df[,-ncol(x_ben_df)]
-
-    print(dim(x_ben_df))
-
-    # TODO: esta dando valores diferentes quando usa-se o metodo featureAsDataset
-
-    # computing features for the whole dataset, for all time series
-    x_all = extractFeatures(x_ben_df, D, tau_l, num_of_features, showTime=FALSE, na_aware=FALSE, na_rm=FALSE)
-
-    # all classes 
-    y_all = y_ben_df
-
-    
-    # ATTACK DATA
-    #############
-
-    # filtering by a single feature
-    x_att_feat = x_att[,d_name]
-
-    # #TODO: here the label may change for separating different types of
-    # attacks
-
-    # formatting dataset of series_len time series length
-    x_att_df = featureAsDataset(x_att_feat, series_len, label=0, skip=skip)
-
-    # removing class column from dataset matrix
-    y_att_df = x_att_df[,ncol(x_att_df)]
-    x_att_df = x_att_df[,-ncol(x_att_df)]
-
-    print(dim(x_att_df))
-
-    # computing features for the whole dataset, for all time series
-    x_all_att = extractFeatures(x_att_df, D, tau_l, num_of_features, showTime=FALSE, na_aware=FALSE, na_rm=FALSE)
-
-    # all classes
-    y_all_att = y_att_df
-
-
-    ################ SPLIT TRAIN/TEST ###############
-
-    # BENIGN DATA
-    #############
-
-    #TODO: maybe select these train samples randomly?
-    
-    ## define the split rate
-    #id_train = createDataPartition(y=y_all, p=train_pct, list=FALSE)
-    # NOTE: using half the time series for training on benign data
-    #id_train = 1:round(nrow(x_all)/2)
-    # NOTE: using 2/3 for train and 1/3 for test
-    id_train = 1:round((2/3)*nrow(x_all))
-
-    # Splitting datasets
-    x_train = x_all[id_train,]
-    y_train = y_all[id_train]
-
-    x_test = x_all[-id_train,]
-    y_test = y_all[-id_train]
-
-
-    # ATTACK DATA
-    #############
-
-    x_test = rbind(x_test, x_all_att)
-    y_test = c(y_test, y_all_att)
-
-    print(dim(x_test))
-
-    
     ########### TODO:
     # testando a analise das features
     #plotFeatures(x_test, y_test, paste('antes-',d_name,'-', sep=''), num_of_features)
@@ -502,22 +477,6 @@ for (d_name in d_name_l)
     # - analisar os erros
     # - precisa ver quais features sao melhores, pra tentar melhorar os
     # resultados
-
-    ################ SCALING DATA ###############
-
-    printdebug('Scaling data')
-
-    # TODO: we have to scale the computed features 
-    # preprocesing the features dataset
-    transform = preProcess(x_train, method=c("center", "scale"))
-
-    x_train = predict(transform, x_train)
-    x_test  = predict(transform, x_test)
-
-    # testando a analise das features
-    #plotFeatures(x_test, y_test, paste('depois-',d_name,'-', sep=''), num_of_features)
-
-    printdebug('Data scaled')
 
     ##################################################
     ##################################################
@@ -584,7 +543,7 @@ for (d_name in d_name_l)
     #max_pred = mean(pred_train)*golden_ratio   
     #max_pred = 0.6 #<<<< ese é muito bom, erra apenas 1
     #max_pred = mean(pred_train)+mean(pred_train)*euler   
-    max_pred = 0.59 #<<<< ese é muito bom, erra apenas 1
+    max_pred = 0.59 #<<<< ese é muito bom, noa erra nenhum
 
     cat('max_pred0: ',max(pred_train) + sd(pred_train),'(max+sd)\n')
     cat('max_pred1: ',mean(pred_train) + 2*sd(pred_train),'(mean+2sd)\n')
