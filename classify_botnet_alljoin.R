@@ -207,9 +207,17 @@ for (device in dev_names)
 {
 
     ################ LOADING BENIGN DATA ###############
+
+    # the path to the benign data
+    filename = paste(dataset_path, '/', device, '/', f_names[1,1], '.csv', sep='')
+
+    if (!file.exists(filename))
+    {
+        next
+    }
     
-    # these are prepared botnet data, from N-BaIoT
-    x_ben = read.csv(paste(dataset_path, '/', device, '/', f_names[1,1], '.csv', sep=''))
+    # loading the data
+    x_ben = read.csv(filename)
 
     # filtering by a single feature
     x_ben_feat = x_ben[,d_name]
@@ -258,6 +266,8 @@ for (device in dev_names)
 
 }
 
+#quit()
+
 print(dim(x_all_train))
 print(dim(x_all_test))
 
@@ -272,8 +282,17 @@ for (device in dev_names)
     {
     
         ################ LOADING ATTACK DATA ###############
+        
+        # the path to the attack data
+        filename = paste(dataset_path, '/', device, '/', f_names[attack,1], '.csv', sep='')
+
+        if (!file.exists(filename))
+        {
+            next
+        }
     
-        x_att = read.csv(paste(dataset_path, '/', device, '/', f_names[attack,1], '.csv', sep=''))
+        # loading the data
+        x_att = read.csv(filename)
 
         # filtering by a single feature
         x_att_feat = x_att[,d_name]
@@ -299,8 +318,6 @@ for (device in dev_names)
         # all classes
         y_all_att = y_att_df
 
-        ################ SPLIT TRAIN/TEST ###############
-
         ################ ADDING TO GENERAL DATASET ###############
 
         # NOTE: all attack data is going to test
@@ -311,9 +328,21 @@ for (device in dev_names)
     }
 }
 
+print(dim(x_all_train))
 print(dim(x_all_test))
 
 quit()
+
+################ SCALING DATA ###############
+
+printdebug('Scaling data')
+
+# TODO: we have to scale the computed features 
+# preprocesing the features dataset
+transform = preProcess(x_all_train, method=c("center", "scale"))
+
+x_all_train = predict(transform, x_all_train)
+x_all_test  = predict(transform, x_all_test)
 
 
 
