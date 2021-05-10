@@ -33,35 +33,22 @@ library(reshape2)
 #suppressMessages(library(gridExtra))
 #suppressMessages(library(factoextra))
 
-# TODO: package for isolationForest
-#library(solitude)
+# package for isolationForest
 library(isotree)
 
-# extended isolation forest
-#library(eif)
-
-#
-#library(Rlof)
-
 printdebug('Loaded libraries and functions')
-
 
 # getting command line args
 args = commandArgs(trailingOnly = TRUE)
 
 if (length(args) == 0)
 {
-    # TODO: precisa criar o dataset no formato adequado?
-    
-    # NOTE: this is the dataset from the Intel Lab, only filtering for
-    # the lines with 8 columns
-
-    # dataset name
-    #d_name = 'HH_L5_radius' # 0.90625
-    d_name = 'MI_dir_L5_weight'  # 0.9375
-    #d_name = 'MI_dir_L5_mean'     # 0.04
-    #d_name = 'MI_dir_L5_variance' # 0.88
-    #d_name = 'H_L5_weight'  # 0.9453
+    # the network measure name
+    #d_name = 'HH_L5_radius'
+    #d_name = 'MI_dir_L5_mean'
+    #d_name = 'MI_dir_L5_variance'
+    #d_name = 'H_L5_weight'
+    d_name = 'MI_dir_L5_weight'
 
     # the Bandt-Pompe parameters
 
@@ -70,16 +57,13 @@ if (length(args) == 0)
 
     # embedding delay
     #tau_l=1:50
-    #tau_l=1:10
     tau_l=1:10
 
     # default SEED is loaded from config.R
     SEED=1
 
-    # used for loading the time series
+    # used for creating the dataset of time series
     series_len = 1000
-    #series_len = 2000
-    #series_len = 5000
 
     # trying a single model for device
     device = 'Danmini_Doorbell'
@@ -110,7 +94,7 @@ if (length(args) == 0)
     # the seed to random
     SEED = as.numeric(args[3])
 
-    # the series len to use (1000 or 5000)
+    # the series len to create the dataset
     series_len = as.numeric(args[4])
     
     # the device
@@ -124,15 +108,14 @@ if (length(args) == 0)
 set.seed(SEED)
 
 # the percentage of train dataset split
+# default is 2/3
 train_pct = TRAIN_PCT # from config.R
-
-#printdebug(d_name)
 
 printdebug(paste('(D,tau): ',D,',',paste(range(tau_l), collapse=':'), sep=''))
 
 printdebug(paste('SEED:',SEED))
 
-
+# the devices names
 dev_names = c(
     'Danmini_Doorbell',
     'Ecobee_Thermostat',
@@ -144,10 +127,6 @@ dev_names = c(
     'SimpleHome_XCS7_1002_WHT_Security_Camera',
     'SimpleHome_XCS7_1003_WHT_Security_Camera'
     )
-
-# this is the number of points in the new dataset
-#num_rows=5000
-#num_rows=10000
 
 # NOTE: the labels for each class is defined here:
 
@@ -179,8 +158,6 @@ f_names = data.frame(
 dataset_path = './data/botnet/original'
 
 # number of computed features per tau
-#num_of_features = 5
-#num_of_features = 7
 num_of_features = 8
 
 # the network measure to consider

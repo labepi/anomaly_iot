@@ -13,11 +13,8 @@ DEBUG=TRUE
 # the main seed
 SEED=1
 
-# number of k-folds in cross validation
-CVNUM=5
-
 # the percentage of train dataset to split
-TRAIN_PCT=0.8
+TRAIN_PCT=2/3
 
 # if parallelism is enabled for parameter tunning
 DO_PARALLEL=TRUE
