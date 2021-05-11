@@ -107,6 +107,9 @@ if (length(args) == 0)
 # defining the seed
 set.seed(SEED)
 
+# fixing the network measure
+d_name = 'MI_dir_L5_weight'
+
 # the percentage of train dataset split
 # default is 2/3
 train_pct = TRAIN_PCT
