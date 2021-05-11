@@ -304,35 +304,6 @@ print(dim(x_all_train))
 print(dim(x_all_test))
 
 
-
-#######################################
-######### PRE-PROCESSING DATA #########
-#######################################
-
-
-################ SCALING DATA ###############
-
-printdebug('Scaling data')
-
-########### TODO:
-# testando a analise das features
-#plotFeatures(x_test, y_test, paste('antes-',d_name,'-', sep=''), num_of_features)
-
-# TODO: do we have to scale the computed features ?????
-
-### preprocesing the features dataset
-##transform = preProcess(x_all_train, method=c("center", "scale"))
-##
-##x_all_train = predict(transform, x_all_train)
-##x_all_test  = predict(transform, x_all_test)
-
-# testando a analise das features
-#plotFeatures(x_test, y_test, paste('depois-',d_name,'-', sep=''), num_of_features)
-
-printdebug('Data scaled')
-
-
-
 ###############################################
 ################ CLASSIFICATION ###############
 ###############################################
