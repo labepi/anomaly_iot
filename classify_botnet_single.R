@@ -344,7 +344,7 @@ l_s = c("1", "0")
 
 # confusion matrix
 cm = confusionMatrix(factor(res, l_s),factor(y_all_test, l_s))
-printdebug(paste('OVERALL accuracy:',  cm$overall['Accuracy']))
+printdebug(paste('OVERALL accuracy',f_names[attack,1],':', cm$overall['Accuracy']))
 
 print(cm)
 
