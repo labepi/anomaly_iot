@@ -15,6 +15,6 @@ fi
 for series_len in $(seq 200 100 900)
 #for series_len in $(seq 200 100 1000)
 do
-    ./classify_botnet_alljoin.sh $D $tau_end $seed $series_len &> 'results/alljoin/res_alljoin_D'$D'_T'$tau_end'_S'$seed'_L'$series_len'.txt' 
+    ./classify_botnet_alljoin.sh $D $tau_end $seed $series_len &> 'results/alljoin/res_alljoin_D'$D'_T'$tau_end'_S'$seed'_L'$series_len'.txt' &
 done
 
