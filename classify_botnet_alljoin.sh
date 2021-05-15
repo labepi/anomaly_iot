@@ -12,8 +12,8 @@ else
     #device=$5
 fi
 
-for attack in $(seq 2 11)
-do
+#for attack in $(seq 2 11)
+#do
     Rscript classify_botnet_alljoin.R $D $tau_end $seed $series_len $attack
-done
+#done
 
