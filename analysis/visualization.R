@@ -126,7 +126,7 @@ loadFeat = function(feat1 = "MI_dir_L5_weight", num=1000, scale=TRUE)
 # NOTE: como visto acima, os fenomenos parecem variar mais para L5, o
 # que parece ser com intervalos de time window de 100ms
 
-matplot2 = function(data)
+matplot2 = function(data, linelegend=TRUE)
 {
     #ggplot needs a dataframe
     data = as.data.frame(data)
@@ -140,10 +140,11 @@ matplot2 = function(data)
     plot_data$x = rep(1:(ncol(data)-1), each=nrow(data))
 
     plot_data$id = as.factor(plot_data$id)
-    plot_data$Behavior = factor(plot_data$id, labels=behavior)
+    plot_data$Operation = factor(plot_data$id, labels=operation)
 
-    p = ggplot(plot_data, aes(x=x,y=value,group=Behavior,colour=Behavior)) +
-        geom_line(size=1.5) +
+    p = ggplot(plot_data, aes(x=x,y=value,group=Operation,colour=Operation)) +
+        #geom_line(size=1.5) +
+        geom_line(size=1.5, show.legend=linelegend) +
         theme_bw() + 
         scale_color_d3(palette="category20")
 
@@ -155,7 +156,7 @@ matplot2 = function(data)
 }
 
 
-behavior = c(
+operation = c(
             'Benign',
             'Mirai/ACK',
             'Mirai/SCAN',
@@ -187,7 +188,7 @@ p = matplot2(x[j_l,101:500])
 p = p + xlab('Number of samples') + ylab('MI_dir_L5_weight')
 p = p + theme_bw(base_size=24) + theme(legend.position="bottom")
 
-ggsave(paste('img/fig_feat_behavior-',feat,'.pdf',sep=''), p, width=12, height=8)
+ggsave(paste('img/fig_feat_operation-',feat,'.pdf',sep=''), p, width=12, height=8)
 
 
 ###################################
@@ -196,6 +197,8 @@ ggsave(paste('img/fig_feat_behavior-',feat,'.pdf',sep=''), p, width=12, height=8
 
 # TODO:
 # - agora testar o bandt-pompe com esses valores
+
+x = loadFeat(feat, scale=T, num=num_rows)
 
 D=3
 tau=1
@@ -209,14 +212,14 @@ for(i in j_l)
 }
 
 H_SC = data.frame(x=HC[,1], y=HC[,2])
-H_SC$Behavior = factor(j_l, labels=behavior)
+H_SC$Operation = factor(j_l, labels=operation)
     
 # plotting the ccep for the classes
 
 #p = gplot.ccep(H=HC[,1], SC=HC[,2], D=3, col=j_l, shp=j_l, xlim=c(0.5,1), ylim=c(0,0.25))
 p = gplot.ccep(D=3, xlim=c(0.0,1), ylim=c(0,0.3))
 
-p = p + geom_point(aes(x, y, color=Behavior, shape=Behavior), data=H_SC, size=7) + 
+p = p + geom_point(aes(x, y, color=Operation, shape=Operation), data=H_SC, size=7) + 
     scale_color_d3(palette="category20") + scale_shape_manual(values=j_l+14) +
     xlab(expression('Normalized Permutation Entropy ('*H[S]*'['*p[pi]*'])')) +
     ylab(expression('Statistical Complexity ('*C[JS]*'['*p[pi]*'])')) + 
@@ -255,13 +258,13 @@ x_feats = extractFeatures(x[j_l,], D, tau_l, num_of_features,
 
 # Pst feature
 d=5 # <- pst
-p = matplot2(x_feats[,1:10 + (d-1)*10]) + 
-    geom_point(aes(shape=Behavior), size=5) + scale_shape_manual(values=j_l+14) +
+p = matplot2(x_feats[,1:10 + (d-1)*10], lineleg=FALSE) + 
+    geom_point(aes(shape=Operation), size=5) + scale_shape_manual(values=j_l+14) +
     xlab(expression(tau)) + ylab(expression(p[st])) + 
     theme_bw(base_size=24) + theme(legend.position="bottom") +
     scale_x_discrete(limits=1:10)
 
-ggsave(paste('img/fig_feature_pst_D',D,'-',feat,'.pdf',sep=''), p, width=12, height=8)
+ggsave(paste('img/fig_feature_pst_D',D,'-',feat,'.pdf',sep=''), p, width=12, height=6)
 
 ###################3
 

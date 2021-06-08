@@ -1,0 +1,126 @@
+The datasets for the botnet attacks
+-----------------------------------
+
+The time series from the N-BaIoT files are organized into single dataset
+files with 1000 and 5000 data points each, in their respective folders.
+
+The classes consists of the time series types, which are the last column
+of each dataset file anda corresponds to:
+
+ 1 - benign_traffic
+ 2 - mirai/ack
+ 3 - mirai/scan
+ 4 - mirai/syn
+ 5 - mirai/udp
+ 6 - mirai/udpplain
+ 7 - gafgyt/combo
+ 8 - gafgyt/junk
+ 9 - gafgyt/scan
+10 - gafgyt/tcp
+11 - gafgyt/udp
+
+where the 1 is the regular behavior, and all others are under attack.
+
+
+Original data description
+-------------------------
+
+detection_of_IoT_botnet_attacks_N_BaIoT Data Set
+Download: Data Folder, Data Set Description
+
+Abstract: This dataset addresses the lack of public botnet datasets, especially for the IoT. It suggests *real* traffic data, gathered from 9 commercial IoT devices authentically infected by Mirai and BASHLITE.
+
+Data Set Characteristics:  
+
+Multivariate, Sequential
+
+Number of Instances:
+
+7062606
+
+Area:
+
+Computer
+
+Attribute Characteristics:
+
+Real
+
+Number of Attributes:
+
+115
+
+Date Donated
+
+2018-03-19
+
+Associated Tasks:
+
+Classification, Clustering
+
+Missing Values?
+
+N/A
+
+Number of Web Hits:
+
+77742
+
+
+Source:
+
+-- Creators: Yair Meidan, Michael Bohadana, Yael Mathov, Yisroel Mirsky, Dominik Breitenbacher, Asaf Shabtai and Yuval Elovici
+* Meidan, Bohadana, Mathov, Mirsky, Shabtai: Department of Software and Information Systems Engineering; Ben-Gurion University of the Negev; Beer-Sheva, 8410501; Israel
+* Breitenbacher, Elovici: iTrust Centre of Cybersecurity at Singapore University of Technology and Design; 8 Somapah Rd, Singapore 487372
+
+-- Donor: Yair Meidan (yairme '@' bgu.ac.il)
+-- Date: March, 2018 (databases may change over time without name change!)
+
+
+Data Set Information:
+
+(a) Attribute being predicted:
+-- Originally we aimed at distinguishing between benign and Malicious traffic data by means of anomaly detection techniques.
+-- However, as the malicious data can be divided into 10 attacks carried by 2 botnets, the dataset can also be used for multi-class classification: 10 classes of attacks, plus 1 class of 'benign'.
+
+(b) The study's results:
+-- For each of the 9 IoT devices we trained and optimized a deep autoencoder on 2/3 of its benign data (i.e., the training set of each device). This was done to capture normal network traffic patterns.
+-- The test data of each device comprised of the remaining 1/3 of benign data plus all the malicious data. On each test set we applied the respective trained (deep) autoencoder as an anomaly detector. The detection of anomalies (i.e., the cyberattacks launched from each of the above IoT devices) concluded with 100% TPR.
+
+
+Attribute Information:
+
+-- The following describes each of the features headers:
+
+* Stream aggregation:
+H: Stats summarizing the recent traffic from this packet's host (IP)
+HH: Stats summarizing the recent traffic going from this packet's host (IP) to the packet's destination host.
+HpHp: Stats summarizing the recent traffic going from this packet's host+port (IP) to the packet's destination host+port. Example 192.168.4.2:1242 -> 192.168.4.12:80
+HH_jit: Stats summarizing the jitter of the traffic going from this packet's host (IP) to the packet's destination host.
+
+* Time-frame (The decay factor Lambda used in the damped window):
+How much recent history of the stream is capture in these statistics
+L5, L3, L1, ...
+
+* The statistics extracted from the packet stream:
+weight: The weight of the stream (can be viewed as the number of items observed in recent history)
+mean: ...
+std: ...
+radius: The root squared sum of the two streams' variances
+magnitude: The root squared sum of the two streams' means
+cov: an approximated covariance between two streams
+pcc: an approximated covariance between two streams
+
+
+Relevant Papers:
+
+-- Reference to the article where the feature extractor (from *.pcap to *.csv) was described:
+Y. Mirsky, T. Doitshman, Y. Elovici & A. Shabtai 2018, 'Kitsune: An Ensemble of Autoencoders for Online Network Intrusion Detection', in Network and Distributed System Security (NDSS) Symposium, San Diego, CA, USA.
+
+
+
+Citation Request:
+
+-- Reference to the article where the dataset was initially described and used:
+Y. Meidan, M. Bohadana, Y. Mathov, Y. Mirsky, D. Breitenbacher, A. Shabtai, and Y. Elovici 'N-BaIoT: Network-based Detection of IoT Botnet Attacks Using Deep Autoencoders', IEEE Pervasive Computing, Special Issue - Securing the IoT (July/Sep 2018).
+

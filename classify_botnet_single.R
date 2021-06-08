@@ -317,10 +317,8 @@ max_pred = 0.59
 ### Fit a small isolation forest model
 model = isolation.forest(x_all_train, ntrees = 300, nthreads = 1)
 
-print(model)
-    
-print(summary(model))
-
+#print(model)
+#print(summary(model))
 
 ################ TESTING PHASE ###############
 
