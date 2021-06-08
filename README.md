@@ -46,4 +46,61 @@ on anomalies of multiscale time series dynamics
 
 - utils.R
     - Some utility functions.
-    - 
+
+# Datasets
+
+This is the structure expected for the files of N-BaIoT dataset:
+
+- data/botnet/original/Danmini_Doorbell/
+    - benign_traffic.csv  
+    - gafgyt/  
+        - combo.csv  
+        - junk.csv  
+        - scan.csv  
+        - tcp.csv  
+        - udp.csv
+    - mirai/
+        - ack.csv  
+        - scan.csv  
+        - syn.csv  
+        - udp.csv  
+        - udpplain.csv
+
+- data/botnet/original/Ecobee_Thermostat/
+    - benign_traffic.csv  
+    - gafgyt/  
+    - mirai/
+
+- data/botnet/original/Ennio_Doorbell:
+    - benign_traffic.csv  
+    - gafgyt/
+
+- data/botnet/original/Philips_B120N10_Baby_Monitor:
+    - benign_traffic.csv  
+    - gafgyt/  
+    - mirai/
+
+- data/botnet/original/Provision_PT_737E_Security_Camera:
+    - benign_traffic.csv  
+    - gafgyt/  
+    - mirai/
+
+- data/botnet/original/Provision_PT_838_Security_Camera:
+    - benign_traffic.csv  
+    - gafgyt/  
+    - mirai/
+
+- data/botnet/original/Samsung_SNH_1011_N_Webcam:
+    - benign_traffic.csv  
+    - gafgyt/
+
+- data/botnet/original/SimpleHome_XCS7_1002_WHT_Security_Camera:
+    - benign_traffic.csv  
+    - gafgyt/  
+    - mirai/
+
+- data/botnet/original/SimpleHome_XCS7_1003_WHT_Security_Camera:
+    - benign_traffic.csv  
+    - gafgyt/  
+    - mirai/
+
