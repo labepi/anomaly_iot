@@ -217,7 +217,7 @@ for (device in dev_names)
     x_all_tmp = extractFeatures(x_ben_df, D, tau_l, num_of_features, 
                             showTime=FALSE, na_aware=FALSE, na_rm=FALSE)
 
-    t_feats_atk = t_feats_atk + difftime(Sys.time(), buildTime, units='sec')
+    t_feats_ben = t_feats_ben + difftime(Sys.time(), buildTime, units='sec')
     
     # all classes 
     y_all_tmp = y_ben_df
@@ -392,14 +392,14 @@ l_s = c("1", "0")
 
 
 printdebug(paste('TIME_TRAIN: ', 
-                 'feats', t_feats_ben,
-                 'train:', t_train
+                 'feats: ', t_feats_ben,
+                 'train: ', t_train
                  ))
 
 
 printdebug(paste('TIME_TEST: ', 
-                 'feats', t_feats_atk,
-                 'train:', t_test
+                 'feats: ', t_feats_atk,
+                 'train: ', t_test
                  ))
 
 
