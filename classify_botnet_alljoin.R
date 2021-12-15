@@ -180,6 +180,8 @@ y_all_test = c()
 # LOADING BENIGN DATA FROM ALL DEVICES
 ######################################
 
+t_feats_ben = 0
+
 for (device in dev_names)
 {
 
@@ -209,10 +211,14 @@ for (device in dev_names)
 
     ################ COMPUTING FEATURES ###############
     
+    buildTime = Sys.time()
+    
     # computing features for the whole dataset, for all time series
     x_all_tmp = extractFeatures(x_ben_df, D, tau_l, num_of_features, 
                             showTime=FALSE, na_aware=FALSE, na_rm=FALSE)
 
+    t_feats_atk = t_feats_atk + difftime(Sys.time(), buildTime, units='sec')
+    
     # all classes 
     y_all_tmp = y_ben_df
 
@@ -253,6 +259,8 @@ print(dim(x_all_test))
 # LOADING ATTACK DATA FROM ALL DEVICES
 ######################################
 
+t_feats_atk = 0
+
 for (device in dev_names)
 {
     # according to f_names
@@ -289,9 +297,13 @@ for (device in dev_names)
 
         ################ COMPUTING FEATURES ###############
 
+        buildTime = Sys.time()
+        
         # computing features for the whole dataset, for all time series
         x_all_att = extractFeatures(x_att_df, D, tau_l, num_of_features, 
                                     showTime=FALSE, na_aware=FALSE, na_rm=FALSE)
+
+        t_feats_atk = t_feats_atk + difftime(Sys.time(), buildTime, units='sec')
 
         # all classes
         y_all_att = y_att_df
@@ -344,7 +356,6 @@ model = isolation.forest(x_all_train, ntrees = 300, nthreads = 1)
 
 t_train = difftime(Sys.time(), buildTime, units='sec')
 
-printdebug(paste('TRAIN TIME: ', t_train))
 
 print(model)
 print(summary(model))
@@ -355,9 +366,12 @@ print(summary(model))
 
 # testing the tunned parameters
 
+buildTime = Sys.time()
 
 # predicting on x_test
 res = predict(model, x_all_test)
+
+t_test = difftime(Sys.time(), buildTime, units='sec')
 
 print('PRED:')
 print(res)
@@ -376,9 +390,24 @@ printdebug(paste('Predicted test:', paste(y_all_test, res, sep='-', collapse=','
 # preparing the parameters for confusion matrix 
 l_s = c("1", "0")
 
+
+printdebug(paste('TIME_TRAIN: ', 
+                 'feats', t_feats_ben,
+                 'train:', t_train
+                 ))
+
+
+printdebug(paste('TIME_TEST: ', 
+                 'feats', t_feats_atk,
+                 'train:', t_test
+                 ))
+
+
 # confusion matrix
 cm = confusionMatrix(factor(res, l_s),factor(y_all_test, l_s))
 printdebug(paste('OVERALL accuracy: ', cm$overall['Accuracy']))
+
+
 
 print(cm)
 
