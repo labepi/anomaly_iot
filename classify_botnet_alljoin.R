@@ -334,11 +334,17 @@ max_pred = 0.59
 ################ TRAINING PHASE ###############
 
 
+buildTime = Sys.time()
+
 # Fit a small isolation forest model
 #model[[i]] = isolation.forest(x_train, ntrees = 200, nthreads = 1)
 model = isolation.forest(x_all_train, ntrees = 300, nthreads = 1)
 #model[[i]] = isolation.forest(x_train, ntrees = 500, nthreads = 1)
 #model[[i]] = isolation.forest(x_train, ntrees = 1000, nthreads = 1)
+
+t_train = difftime(Sys.time(), buildTime, units='sec')
+
+printdebug(paste('TRAIN TIME: ', t_train))
 
 print(model)
 print(summary(model))
